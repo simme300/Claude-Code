@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Homepage - Claude Code{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="homepage-header">
+        <h1>Welcome back, {{ user.username }}!</h1>
+        <p class="subtitle">Track your fitness journey</p>
+    </div>
+    
+    <div class="action-cards">
+        <div class="card">
+            <h3>Create Workout</h3>
+            <p>Start tracking a new workout session</p>
+            <a href="{% url 'main:create_workout' %}" class="btn btn-primary">New Workout</a>
+        </div>
+        
+        <div class="card">
+            <h3>View Progress</h3>
+            <p>See your fitness progress over time</p>
+            <a href="#" class="btn btn-secondary">View Stats</a>
+        </div>
+        
+        <div class="card">
+            <h3>Meal Tracking</h3>
+            <p>Log your daily nutrition</p>
+            <a href="#" class="btn btn-secondary">Add Meal</a>
+        </div>
+    </div>
+    
+    <div class="recent-activity">
+        <h2>Recent Workouts</h2>
+        {% if recent_workouts %}
+            <div class="workout-list">
+                {% for workout in recent_workouts %}
+                    <div class="workout-item">
+                        <div class="workout-info">
+                            <h4>{{ workout.title }}</h4>
+                            <p class="workout-details">
+                                {% if workout.day %}{{ workout.day }} | {% endif %}
+                                {% if workout.duration %}{{ workout.duration }} | {% endif %}
+                                {{ workout.created_at|date:"M d, Y" }}
+                            </p>
+                        </div>
+                        <div class="workout-actions">
+                            <a href="{% url 'main:workout_detail' workout.id %}" class="btn btn-sm btn-outline">View</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p>No workouts yet. <a href="{% url 'main:create_workout' %}">Create your first workout!</a></p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

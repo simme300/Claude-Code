@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}My Workouts - Claude Code{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="workouts-page">
+        <div class="page-header">
+            <h2>My Workouts</h2>
+            <p class="page-description">All your workout sessions and exercises</p>
+        </div>
+        
+        {% if workouts %}
+            {% for workout in workouts %}
+                <div class="workout-section">
+                    <div class="workout-info">
+                        <h3>{{ workout.title }}</h3>
+                        <div class="workout-meta">
+                            {% if workout.day %}
+                                <span class="meta-item"><strong>Day:</strong> {{ workout.day }}</span>
+                            {% endif %}
+                            {% if workout.duration %}
+                                <span class="meta-item"><strong>Duration:</strong> {{ workout.duration }}</span>
+                            {% endif %}
+                            <span class="meta-item"><strong>Date:</strong> {{ workout.created_at|date:"F d, Y" }}</span>
+                        </div>
+                    </div>
+                    
+                    {% if workout.exercises.all %}
+                        <div class="exercises-table">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Exercise</th>
+                                        <th>Sets</th>
+                                        <th>Reps</th>
+                                        <th>Weight</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for exercise in workout.exercises.all %}
+                                        <tr>
+                                            <td>{{ exercise.name }}</td>
+                                            <td>{{ exercise.sets }}</td>
+                                            <td>{{ exercise.reps }}</td>
+                                            <td>{{ exercise.weight }} {{ exercise.weight_unit }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="no-exercises">
+                            <p>No exercises recorded for this workout.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <h3>No Workouts Yet</h3>
+                <p>You haven't created any workouts yet. Start tracking your fitness journey!</p>
+                <a href="{% url 'main:create_workout' %}" class="btn btn-primary">Create Your First Workout</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Workout - Claude Code{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Create New Workout</h2>
+    
+    <form method="post" class="workout-form">
+        {% csrf_token %}
+        
+        <div class="workout-details">
+            <h3>Workout Details</h3>
+            
+            <div class="form-group">
+                <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="error-messages">
+                        {% for error in form.title.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.day.id_for_label }}">{{ form.day.label }}</label>
+                {{ form.day }}
+                {% if form.day.errors %}
+                    <div class="error-messages">
+                        {% for error in form.day.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.duration.id_for_label }}">{{ form.duration.label }}</label>
+                {{ form.duration }}
+                <small class="form-text">Format: HH:MM:SS (e.g., 01:30:00 for 1 hour 30 minutes)</small>
+                {% if form.duration.errors %}
+                    <div class="error-messages">
+                        {% for error in form.duration.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="exercises-section">
+            <h3>Exercises</h3>
+            <p class="section-description">Add exercises to your workout. Click "Add Exercise" to add more exercises as needed.</p>
+            
+            {{ exercise_formset.management_form }}
+            
+            <div class="exercise-formset" id="exercise-formset">
+                {% for exercise_form in exercise_formset %}
+                    <div class="exercise-form" data-form-index="{{ forloop.counter0 }}">
+                        <div class="exercise-header">
+                            <h4>Exercise {{ forloop.counter }}</h4>
+                            {% if not forloop.first %}
+                                <button type="button" class="btn-remove-exercise" onclick="removeExercise(this)">Remove</button>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="exercise-fields">
+                            <div class="form-group">
+                                <label for="{{ exercise_form.name.id_for_label }}">Exercise Name</label>
+                                {{ exercise_form.name }}
+                                {% if exercise_form.name.errors %}
+                                    <div class="error-messages">
+                                        {% for error in exercise_form.name.errors %}
+                                            <span class="error">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="{{ exercise_form.sets.id_for_label }}">Sets</label>
+                                    {{ exercise_form.sets }}
+                                    {% if exercise_form.sets.errors %}
+                                        <div class="error-messages">
+                                            {% for error in exercise_form.sets.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="{{ exercise_form.reps.id_for_label }}">Reps</label>
+                                    {{ exercise_form.reps }}
+                                    {% if exercise_form.reps.errors %}
+                                        <div class="error-messages">
+                                            {% for error in exercise_form.reps.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="{{ exercise_form.weight.id_for_label }}">Weight</label>
+                                    {{ exercise_form.weight }}
+                                    {% if exercise_form.weight.errors %}
+                                        <div class="error-messages">
+                                            {% for error in exercise_form.weight.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="{{ exercise_form.weight_unit.id_for_label }}">Unit</label>
+                                    {{ exercise_form.weight_unit }}
+                                    {% if exercise_form.weight_unit.errors %}
+                                        <div class="error-messages">
+                                            {% for error in exercise_form.weight_unit.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="add-exercise-section">
+                <button type="button" class="btn btn-secondary" onclick="addExercise()">Add Exercise</button>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Workout</button>
+            <a href="{% url 'main:homepage' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+// Exercise form management functions
+function addExercise() {
+    console.log('Add exercise function called');
+    
+    const formset = document.getElementById('exercise-formset');
+    const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
+    
+    if (!formset || !totalFormsInput) {
+        console.error('Required elements not found:', { formset, totalFormsInput });
+        return;
+    }
+    
+    const currentFormCount = parseInt(totalFormsInput.value);
+    console.log('Current form count:', currentFormCount);
+    
+    // Clone the first exercise form
+    const firstForm = formset.querySelector('.exercise-form');
+    if (!firstForm) {
+        console.error('No exercise form found to clone');
+        return;
+    }
+    
+    const newForm = firstForm.cloneNode(true);
+    
+    // Update form index
+    newForm.setAttribute('data-form-index', currentFormCount);
+    
+    // Clear all input values in the new form
+    const inputs = newForm.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if (input.type === 'text' || input.type === 'number') {
+            input.value = '';
+        } else if (input.tagName === 'SELECT') {
+            input.selectedIndex = 0;
+        }
+        
+        // Update input names and IDs for the new form
+        const name = input.getAttribute('name');
+        const id = input.getAttribute('id');
+        if (name) {
+            const newName = name.replace(/form-\d+/, `form-${currentFormCount}`);
+            input.setAttribute('name', newName);
+            console.log('Updated name:', name, '->', newName);
+        }
+        if (id) {
+            const newId = id.replace(/form-\d+/, `form-${currentFormCount}`);
+            input.setAttribute('id', newId);
+            console.log('Updated id:', id, '->', newId);
+        }
+    });
+    
+    // Update labels for attributes
+    const labels = newForm.querySelectorAll('label');
+    labels.forEach(label => {
+        const forAttr = label.getAttribute('for');
+        if (forAttr) {
+            const newFor = forAttr.replace(/form-\d+/, `form-${currentFormCount}`);
+            label.setAttribute('for', newFor);
+            console.log('Updated for:', forAttr, '->', newFor);
+        }
+    });
+    
+    // Clear error messages
+    const errorDivs = newForm.querySelectorAll('.error-messages');
+    errorDivs.forEach(div => div.remove());
+    
+    // Ensure remove button exists
+    const header = newForm.querySelector('.exercise-header');
+    let removeBtn = header.querySelector('.btn-remove-exercise');
+    if (!removeBtn) {
+        removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn-remove-exercise';
+        removeBtn.textContent = 'Remove';
+        removeBtn.onclick = function() { removeExercise(this); };
+        header.appendChild(removeBtn);
+    }
+    
+    // Append the new form
+    formset.appendChild(newForm);
+    console.log('New form appended');
+    
+    // Update total forms count
+    totalFormsInput.value = currentFormCount + 1;
+    console.log('Updated total forms to:', currentFormCount + 1);
+    
+    // Update exercise numbers
+    updateExerciseNumbers();
+}
+
+function removeExercise(button) {
+    console.log('Remove exercise function called');
+    
+    const exerciseForm = button.closest('.exercise-form');
+    const formset = document.getElementById('exercise-formset');
+    
+    // Don't remove if it's the only form
+    if (formset.querySelectorAll('.exercise-form').length <= 1) {
+        console.log('Cannot remove last exercise form');
+        return;
+    }
+    
+    exerciseForm.remove();
+    console.log('Exercise form removed');
+    
+    // Update total forms count
+    const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
+    totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
+    
+    // Update exercise numbers
+    updateExerciseNumbers();
+    
+    // Re-index all forms
+    reindexForms();
+}
+
+function updateExerciseNumbers() {
+    const exerciseForms = document.querySelectorAll('.exercise-form');
+    exerciseForms.forEach((form, index) => {
+        const header = form.querySelector('h4');
+        if (header) {
+            header.textContent = `Exercise ${index + 1}`;
+        }
+    });
+}
+
+function reindexForms() {
+    const exerciseForms = document.querySelectorAll('.exercise-form');
+    exerciseForms.forEach((form, index) => {
+        form.setAttribute('data-form-index', index);
+        
+        const inputs = form.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            const name = input.getAttribute('name');
+            const id = input.getAttribute('id');
+            if (name) {
+                input.setAttribute('name', name.replace(/form-\d+/, `form-${index}`));
+            }
+            if (id) {
+                input.setAttribute('id', id.replace(/form-\d+/, `form-${index}`));
+            }
+        });
+        
+        const labels = form.querySelectorAll('label');
+        labels.forEach(label => {
+            const forAttr = label.getAttribute('for');
+            if (forAttr) {
+                label.setAttribute('for', forAttr.replace(/form-\d+/, `form-${index}`));
+            }
+        });
+    });
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Exercise form JavaScript loaded');
+    updateExerciseNumbers();
+});
+</script>
+{% endblock %}

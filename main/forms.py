@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import formset_factory
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from .models import Workout, Exercise
@@ -10,6 +11,20 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'password1', 'password2')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control'})
+        self.fields['email'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password1'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password2'].widget.attrs.update({'class': 'form-control'})
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password'].widget.attrs.update({'class': 'form-control'})
 
 
 class WorkoutForm(forms.ModelForm):
@@ -57,3 +72,7 @@ class ExerciseForm(forms.ModelForm):
                 'class': 'form-control'
             })
         }
+
+
+# Create a formset for exercises
+ExerciseFormSet = formset_factory(ExerciseForm, extra=1, can_delete=True)

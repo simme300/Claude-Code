@@ -9,8 +9,22 @@
 </head>
 <body>
     <header>
-        <nav>
-            <h1>Claude Code</h1>
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <h1><a href="{% url 'main:index' %}">Claude Code</a></h1>
+            </div>
+            <div class="navbar-menu">
+                <a href="{% url 'main:homepage' %}" class="nav-link">Home</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'main:my_workouts' %}" class="nav-link">My Workouts</a>
+                    <a href="{% url 'main:create_workout' %}" class="nav-link">Add Workout</a>
+                    <a href="#" class="nav-link">Add Meals</a>
+                    <a href="#" class="nav-link">Logout</a>
+                {% else %}
+                    <a href="{% url 'main:login' %}" class="nav-link">Login</a>
+                    <a href="{% url 'main:signup' %}" class="nav-link">Signup</a>
+                {% endif %}
+            </div>
         </nav>
     </header>
     

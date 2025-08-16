@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ workout.title }} - Claude Code{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="workout-detail">
+        <div class="workout-header">
+            <h2>{{ workout.title }}</h2>
+            {% if workout.day %}
+                <p class="workout-meta"><strong>Day:</strong> {{ workout.day }}</p>
+            {% endif %}
+            {% if workout.duration %}
+                <p class="workout-meta"><strong>Duration:</strong> {{ workout.duration }}</p>
+            {% endif %}
+            <p class="workout-meta"><strong>Date:</strong> {{ workout.created_at|date:"F d, Y" }}</p>
+        </div>
+        
+        <div class="exercises-table">
+            <h3>Exercises</h3>
+            {% if exercises %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Exercise</th>
+                            <th>Sets</th>
+                            <th>Reps</th>
+                            <th>Weight</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exercise in exercises %}
+                            <tr>
+                                <td>{{ exercise.name }}</td>
+                                <td>{{ exercise.sets }}</td>
+                                <td>{{ exercise.reps }}</td>
+                                <td>{{ exercise.weight }} {{ exercise.weight_unit }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="no-exercises">No exercises recorded for this workout.</p>
+            {% endif %}
+        </div>
+        
+        <div class="workout-actions">
+            <a href="{% url 'main:homepage' %}" class="btn btn-secondary">Back to Homepage</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
