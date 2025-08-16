@@ -2,7 +2,7 @@ from django import forms
 from django.forms import formset_factory
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Workout, Exercise
+from .models import Workout, Exercise, Set, UserProfile
 
 
 class SignUpForm(UserCreationForm):
@@ -49,15 +49,23 @@ class WorkoutForm(forms.ModelForm):
 class ExerciseForm(forms.ModelForm):
     class Meta:
         model = Exercise
-        fields = ['name', 'sets', 'reps', 'weight', 'weight_unit']
+        fields = ['name']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Exercise name'
-            }),
-            'sets': forms.NumberInput(attrs={
+            })
+        }
+
+
+class SetForm(forms.ModelForm):
+    class Meta:
+        model = Set
+        fields = ['set_number', 'reps', 'weight', 'weight_unit']
+        widgets = {
+            'set_number': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'min': '0'
+                'min': '1'
             }),
             'reps': forms.NumberInput(attrs={
                 'class': 'form-control',
@@ -76,3 +84,41 @@ class ExerciseForm(forms.ModelForm):
 
 # Create a formset for exercises
 ExerciseFormSet = formset_factory(ExerciseForm, extra=1, can_delete=True)
+
+# Create a formset for sets
+SetFormSet = formset_factory(SetForm, extra=1, can_delete=True)
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['age', 'current_weight', 'body_fat_percentage', 'weight_unit']
+        widgets = {
+            'age': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '13',
+                'max': '120',
+                'placeholder': 'Enter your age'
+            }),
+            'current_weight': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01',
+                'placeholder': 'Enter your current weight'
+            }),
+            'body_fat_percentage': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'max': '100',
+                'step': '0.1',
+                'placeholder': 'Enter body fat % (optional)'
+            }),
+            'weight_unit': forms.Select(attrs={
+                'class': 'form-control'
+            })
+        }
+        labels = {
+            'current_weight': 'Current Weight',
+            'body_fat_percentage': 'Body Fat Percentage (%)',
+            'weight_unit': 'Weight Unit'
+        }

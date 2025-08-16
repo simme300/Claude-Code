@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, WorkoutForm, CustomAuthenticationForm, ExerciseFormSet
+from .forms import SignUpForm, WorkoutForm, CustomAuthenticationForm, ExerciseFormSet, SetFormSet, UserProfileForm
+from .models import UserProfile
 
 
 def index(request):
@@ -43,8 +44,19 @@ def user_logout(request):
 @login_required
 def homepage(request):
     """Homepage for logged-in users."""
-    recent_workouts = request.user.workouts.all().order_by('-created_at')[:5]
-    return render(request, 'main/homepage.html', {'recent_workouts': recent_workouts})
+    # Get or create user profile
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    # Calculate basic stats
+    total_workouts = request.user.workouts.count()
+    
+    context = {
+        'user_profile': user_profile,
+        'total_workouts': total_workouts,
+        'profile_incomplete': not (user_profile.age and user_profile.current_weight),
+    }
+    
+    return render(request, 'main/homepage.html', context)
 
 
 @login_required
@@ -85,6 +97,9 @@ def create_workout(request):
             else:
                 workout = form.save(commit=False)
                 workout.user = request.user
+                # Set workout number based on user's current workout count
+                user_workout_count = request.user.workouts.count()
+                workout.workout_number = user_workout_count + 1
                 workout.save()
                 
                 # Save exercises that have data
@@ -103,3 +118,19 @@ def create_workout(request):
         'exercise_formset': exercise_formset,
         'exercise_error': exercise_error
     })
+
+
+@login_required
+def edit_profile(request):
+    """Edit user profile information."""
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('main:homepage')
+    else:
+        form = UserProfileForm(instance=user_profile)
+    
+    return render(request, 'main/edit_profile.html', {'form': form})

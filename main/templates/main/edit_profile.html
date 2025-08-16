@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - Claude Code{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Edit Your Profile</h1>
+        <p class="subtitle">Update your fitness information</p>
+    </div>
+    
+    <div class="form-container">
+        <form method="post" class="profile-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.age.id_for_label }}">{{ form.age.label }}</label>
+                {{ form.age }}
+                {% if form.age.help_text %}
+                    <small class="form-text">{{ form.age.help_text }}</small>
+                {% endif %}
+                {% if form.age.errors %}
+                    <div class="error">{{ form.age.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.current_weight.id_for_label }}">{{ form.current_weight.label }}</label>
+                <div class="weight-input-group">
+                    {{ form.current_weight }}
+                    {{ form.weight_unit }}
+                </div>
+                {% if form.current_weight.help_text %}
+                    <small class="form-text">{{ form.current_weight.help_text }}</small>
+                {% endif %}
+                {% if form.current_weight.errors %}
+                    <div class="error">{{ form.current_weight.errors }}</div>
+                {% endif %}
+                {% if form.weight_unit.errors %}
+                    <div class="error">{{ form.weight_unit.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.body_fat_percentage.id_for_label }}">{{ form.body_fat_percentage.label }}</label>
+                {{ form.body_fat_percentage }}
+                {% if form.body_fat_percentage.help_text %}
+                    <small class="form-text">{{ form.body_fat_percentage.help_text }}</small>
+                {% endif %}
+                {% if form.body_fat_percentage.errors %}
+                    <div class="error">{{ form.body_fat_percentage.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Profile</button>
+                <a href="{% url 'main:homepage' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -21,8 +21,8 @@
                 {% if user.is_authenticated %}
                     <a href="{% url 'main:my_workouts' %}" class="nav-link">My Workouts</a>
                     <a href="{% url 'main:create_workout' %}" class="nav-link">Add Workout</a>
-                    <a href="#" class="nav-link">Add Meals</a>
-                    <a href="#" class="nav-link">Logout</a>
+                    <a href="#" class="nav-link">Meal Tracking</a>
+                    <a href="{% url 'main:logout' %}" class="nav-link">Logout</a>
                 {% else %}
                     <a href="{% url 'main:login' %}" class="nav-link">Login</a>
                     <a href="{% url 'main:signup' %}" class="nav-link">Signup</a>
