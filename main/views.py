@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, WorkoutForm, CustomAuthenticationForm, ExerciseFormSet
 
@@ -33,6 +33,11 @@ def user_login(request):
     else:
         form = CustomAuthenticationForm()
     return render(request, 'main/login.html', {'form': form})
+
+
+def user_logout(request):
+    logout(request)
+    return redirect('main:login')
 
 
 @login_required
