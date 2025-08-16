@@ -1,0 +1,322 @@
+/* My Workouts Page Styles */
+.workouts-page {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.page-header h2 {
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.page-description {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* Workout Grid Layout */
+.workouts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.workout-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.workout-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.workout-card-header {
+  background: #333;
+  color: white;
+  padding: 1.5rem;
+}
+
+.workout-card-header h3 {
+  margin: 0 0 1rem 0;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.workout-card .workout-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.workout-card .meta-item {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+}
+
+/* Workout Tables */
+.workout-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  background-color: #fafafa;
+}
+
+.workout-table th {
+  background: #333;
+  color: white;
+  padding: 1rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 1px solid #555;
+}
+
+.workout-table td {
+  padding: 0.875rem 0.75rem;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  color: #333;
+}
+
+.workout-table tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.workout-table tbody tr:hover {
+  background-color: #e3f2fd;
+}
+
+.workout-card .exercises-table {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  margin: 0;
+}
+
+.workout-card .no-exercises {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  background: #f8f9fa;
+  font-size: 1.1rem;
+}
+
+/* Workout Detail Styles */
+.workout-detail {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.workout-header {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.workout-header h2 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.workout-meta {
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+.exercises-table {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.exercises-table h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 0.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #333;
+  border-top: 2px solid #007bff;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.no-exercises {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 2rem;
+}
+
+.workout-actions {
+  text-align: center;
+}
+
+/* Legacy workout section styles (for old layout) */
+.workout-section {
+  background: white;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.workout-info {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.workout-info h3 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1.4rem;
+}
+
+.meta-item {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.workout-section .table {
+  margin: 0;
+  border-radius: 0;
+}
+
+.workout-section .table th {
+  background-color: #007bff;
+  color: white;
+  border-top: none;
+  font-weight: bold;
+  padding: 1rem 0.75rem;
+}
+
+.workout-section .table td {
+  padding: 0.75rem;
+  vertical-align: middle;
+}
+
+.workout-section .table tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.workout-section .table tbody tr:hover {
+  background-color: #e3f2fd;
+}
+
+.workout-section .no-exercises {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.workouts-page .empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.workouts-page .empty-state h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.workouts-page .empty-state p {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+/* Responsive design for workout grid */
+@media (max-width: 992px) {
+  .workouts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .workouts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .workout-card {
+    margin: 0 0.5rem;
+  }
+
+  .workout-card-header {
+    padding: 1.25rem;
+  }
+
+  .workout-card-header h3 {
+    font-size: 1.3rem;
+  }
+
+  .workout-table th,
+  .workout-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .page-header {
+    padding: 0 1rem;
+  }
+  
+  .table {
+    font-size: 0.875rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .workouts-grid {
+    margin: 0 -0.5rem;
+  }
+
+  .workout-card {
+    margin: 0;
+  }
+}

@@ -62,28 +62,39 @@ def my_workouts(request):
 
 @login_required
 def create_workout(request):
+    exercise_error = None
+    
     if request.method == 'POST':
         form = WorkoutForm(request.POST)
         exercise_formset = ExerciseFormSet(request.POST)
         
         if form.is_valid() and exercise_formset.is_valid():
-            workout = form.save(commit=False)
-            workout.user = request.user
-            workout.save()
-            
-            # Save exercises that have data
+            # Check if at least one exercise has data
+            valid_exercises = []
             for exercise_form in exercise_formset:
                 if exercise_form.cleaned_data and exercise_form.cleaned_data.get('name'):
+                    valid_exercises.append(exercise_form)
+            
+            if not valid_exercises:
+                exercise_error = "You must add at least one exercise to create a workout."
+            else:
+                workout = form.save(commit=False)
+                workout.user = request.user
+                workout.save()
+                
+                # Save exercises that have data
+                for exercise_form in valid_exercises:
                     exercise = exercise_form.save(commit=False)
                     exercise.workout = workout
                     exercise.save()
-            
-            return redirect('main:homepage')
+                
+                return redirect('main:homepage')
     else:
         form = WorkoutForm()
         exercise_formset = ExerciseFormSet()
     
     return render(request, 'main/create_workout.html', {
         'form': form,
-        'exercise_formset': exercise_formset
+        'exercise_formset': exercise_formset,
+        'exercise_error': exercise_error
     })

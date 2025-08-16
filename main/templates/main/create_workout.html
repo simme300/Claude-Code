@@ -54,6 +54,12 @@
             <h3>Exercises</h3>
             <p class="section-description">Add exercises to your workout. Click "Add Exercise" to add more exercises as needed.</p>
             
+            {% if exercise_error %}
+                <div class="error-messages">
+                    <span class="error">{{ exercise_error }}</span>
+                </div>
+            {% endif %}
+            
             {{ exercise_formset.management_form }}
             
             <div class="exercise-formset" id="exercise-formset">
