@@ -102,11 +102,41 @@ def create_workout(request):
                 workout.workout_number = user_workout_count + 1
                 workout.save()
                 
-                # Save exercises that have data
-                for exercise_form in valid_exercises:
+                # Save exercises and their sets
+                for exercise_index, exercise_form in enumerate(valid_exercises):
                     exercise = exercise_form.save(commit=False)
                     exercise.workout = workout
                     exercise.save()
+                    
+                    # Process sets for this exercise
+                    set_number = 1
+                    set_index = 0
+                    
+                    while True:
+                        reps_key = f'exercise_{exercise_index}_set_{set_index}_reps'
+                        weight_key = f'exercise_{exercise_index}_set_{set_index}_weight'
+                        weight_unit_key = f'exercise_{exercise_index}_set_{set_index}_weight_unit'
+                        
+                        if reps_key not in request.POST:
+                            break
+                        
+                        reps = request.POST.get(reps_key)
+                        weight = request.POST.get(weight_key)
+                        weight_unit = request.POST.get(weight_unit_key, 'Lbs')
+                        
+                        # Only create set if reps is provided and not empty
+                        if reps and reps.strip():
+                            from .models import Set
+                            Set.objects.create(
+                                exercise=exercise,
+                                set_number=set_number,
+                                reps=int(reps),
+                                weight=float(weight) if weight and weight.strip() else 0,
+                                weight_unit=weight_unit
+                            )
+                            set_number += 1
+                        
+                        set_index += 1
                 
                 return redirect('main:homepage')
     else:

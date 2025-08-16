@@ -42,9 +42,21 @@
                                         {% for exercise in workout.exercises.all %}
                                             <tr>
                                                 <td>{{ exercise.name }}</td>
-                                                <td>{{ exercise.sets }}</td>
-                                                <td>{{ exercise.reps }}</td>
-                                                <td>{{ exercise.weight }} {{ exercise.weight_unit }}</td>
+                                                <td>{{ exercise.sets.count }}</td>
+                                                <td>
+                                                    {% if exercise.sets.all %}
+                                                        {% for set in exercise.sets.all %}{{ set.reps }}{% if not forloop.last %} - {% endif %}{% endfor %}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if exercise.sets.all %}
+                                                        {% for set in exercise.sets.all %}{{ set.weight }}{% if not forloop.last %} - {% endif %}{% endfor %}{% if exercise.sets.all.0.weight_unit %} {{ exercise.sets.all.0.weight_unit }}{% endif %}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
@@ -67,4 +79,47 @@
         {% endif %}
     </div>
 </div>
+
+<style>
+.exercises-table {
+    margin-top: 1rem;
+    overflow-x: auto;
+}
+
+.workout-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.workout-table th {
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.workout-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: top;
+}
+
+.workout-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .workout-table th,
+    .workout-table td {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+</style>
 {% endblock %}

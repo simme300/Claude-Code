@@ -16,29 +16,38 @@
             <p class="workout-meta"><strong>Date:</strong> {{ workout.created_at|date:"F d, Y" }}</p>
         </div>
         
-        <div class="exercises-table">
+        <div class="exercises-section">
             <h3>Exercises</h3>
             {% if exercises %}
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Exercise</th>
-                            <th>Sets</th>
-                            <th>Reps</th>
-                            <th>Weight</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for exercise in exercises %}
-                            <tr>
-                                <td>{{ exercise.name }}</td>
-                                <td>{{ exercise.sets }}</td>
-                                <td>{{ exercise.reps }}</td>
-                                <td>{{ exercise.weight }} {{ exercise.weight_unit }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                {% for exercise in exercises %}
+                    <div class="exercise-card">
+                        <h4>{{ exercise.name }}</h4>
+                        {% if exercise.sets.all %}
+                            <div class="sets-table">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Set</th>
+                                            <th>Reps</th>
+                                            <th>Weight</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for set in exercise.sets.all %}
+                                            <tr>
+                                                <td>{{ set.set_number }}</td>
+                                                <td>{{ set.reps }}</td>
+                                                <td>{{ set.weight }} {{ set.weight_unit }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="no-sets">No sets recorded for this exercise.</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             {% else %}
                 <p class="no-exercises">No exercises recorded for this workout.</p>
             {% endif %}
@@ -49,4 +58,71 @@
         </div>
     </div>
 </div>
+
+<style>
+.exercise-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.exercise-card h4 {
+    margin: 0 0 1rem 0;
+    color: #333;
+    font-size: 1.25rem;
+}
+
+.sets-table {
+    margin-top: 1rem;
+}
+
+.sets-table .table {
+    margin: 0;
+    background: white;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.sets-table th {
+    background-color: #e9ecef;
+    font-weight: 600;
+    text-align: center;
+    padding: 0.75rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.sets-table td {
+    text-align: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.no-sets {
+    color: #6c757d;
+    font-style: italic;
+    margin: 0.5rem 0;
+}
+
+.no-exercises {
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+    padding: 2rem;
+}
+
+@media (max-width: 768px) {
+    .exercise-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .sets-table th,
+    .sets-table td {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+}
+</style>
 {% endblock %}

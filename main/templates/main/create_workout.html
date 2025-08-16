@@ -85,53 +85,38 @@
                                 {% endif %}
                             </div>
                             
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="{{ exercise_form.sets.id_for_label }}">Sets</label>
-                                    {{ exercise_form.sets }}
-                                    {% if exercise_form.sets.errors %}
-                                        <div class="error-messages">
-                                            {% for error in exercise_form.sets.errors %}
-                                                <span class="error">{{ error }}</span>
-                                            {% endfor %}
+                            <div class="sets-section">
+                                <h5>Sets</h5>
+                                <p class="sets-description">Add sets for this exercise. You can add different reps and weights for each set.</p>
+                                
+                                <div class="sets-container" data-exercise-index="{{ forloop.counter0 }}">
+                                    <div class="set-form" data-set-index="0">
+                                        <div class="set-header">
+                                            <span class="set-number">Set 1</span>
+                                            <button type="button" class="btn-remove-set" onclick="removeSet(this)" style="display: none;">Remove</button>
                                         </div>
-                                    {% endif %}
+                                        <div class="set-fields">
+                                            <div class="form-group">
+                                                <label>Reps</label>
+                                                <input type="number" name="exercise_{{ forloop.counter0 }}_set_0_reps" class="form-control" min="0" placeholder="12">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Weight</label>
+                                                <input type="number" name="exercise_{{ forloop.counter0 }}_set_0_weight" class="form-control" min="0" step="0.01" placeholder="50">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Unit</label>
+                                                <select name="exercise_{{ forloop.counter0 }}_set_0_weight_unit" class="form-control">
+                                                    <option value="Lbs">Lbs</option>
+                                                    <option value="Kg">Kg</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <div class="form-group">
-                                    <label for="{{ exercise_form.reps.id_for_label }}">Reps</label>
-                                    {{ exercise_form.reps }}
-                                    {% if exercise_form.reps.errors %}
-                                        <div class="error-messages">
-                                            {% for error in exercise_form.reps.errors %}
-                                                <span class="error">{{ error }}</span>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="{{ exercise_form.weight.id_for_label }}">Weight</label>
-                                    {{ exercise_form.weight }}
-                                    {% if exercise_form.weight.errors %}
-                                        <div class="error-messages">
-                                            {% for error in exercise_form.weight.errors %}
-                                                <span class="error">{{ error }}</span>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="{{ exercise_form.weight_unit.id_for_label }}">Unit</label>
-                                    {{ exercise_form.weight_unit }}
-                                    {% if exercise_form.weight_unit.errors %}
-                                        <div class="error-messages">
-                                            {% for error in exercise_form.weight_unit.errors %}
-                                                <span class="error">{{ error }}</span>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
+                                <div class="add-set-section">
+                                    <button type="button" class="btn btn-sm btn-secondary" onclick="addSet({{ forloop.counter0 }})">Add Set</button>
                                 </div>
                             </div>
                         </div>
@@ -154,18 +139,15 @@
 <script>
 // Exercise form management functions
 function addExercise() {
-    console.log('Add exercise function called');
-    
     const formset = document.getElementById('exercise-formset');
     const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
     
     if (!formset || !totalFormsInput) {
-        console.error('Required elements not found:', { formset, totalFormsInput });
+        console.error('Required elements not found');
         return;
     }
     
     const currentFormCount = parseInt(totalFormsInput.value);
-    console.log('Current form count:', currentFormCount);
     
     // Clone the first exercise form
     const firstForm = formset.querySelector('.exercise-form');
@@ -194,12 +176,35 @@ function addExercise() {
         if (name) {
             const newName = name.replace(/form-\d+/, `form-${currentFormCount}`);
             input.setAttribute('name', newName);
-            console.log('Updated name:', name, '->', newName);
         }
         if (id) {
             const newId = id.replace(/form-\d+/, `form-${currentFormCount}`);
             input.setAttribute('id', newId);
-            console.log('Updated id:', id, '->', newId);
+        }
+    });
+    
+    // Update set form names for the new exercise
+    const setInputs = newForm.querySelectorAll('.sets-container input, .sets-container select');
+    setInputs.forEach(input => {
+        const name = input.getAttribute('name');
+        if (name) {
+            const newName = name.replace(/exercise_\d+/, `exercise_${currentFormCount}`);
+            input.setAttribute('name', newName);
+        }
+    });
+    
+    // Update sets container data attribute
+    const setsContainer = newForm.querySelector('.sets-container');
+    if (setsContainer) {
+        setsContainer.setAttribute('data-exercise-index', currentFormCount);
+    }
+    
+    // Reset sets to just one set
+    const setsContainer2 = newForm.querySelector('.sets-container');
+    const setForms = setsContainer2.querySelectorAll('.set-form');
+    setForms.forEach((setForm, index) => {
+        if (index > 0) {
+            setForm.remove();
         }
     });
     
@@ -210,7 +215,6 @@ function addExercise() {
         if (forAttr) {
             const newFor = forAttr.replace(/form-\d+/, `form-${currentFormCount}`);
             label.setAttribute('for', newFor);
-            console.log('Updated for:', forAttr, '->', newFor);
         }
     });
     
@@ -232,30 +236,24 @@ function addExercise() {
     
     // Append the new form
     formset.appendChild(newForm);
-    console.log('New form appended');
     
     // Update total forms count
     totalFormsInput.value = currentFormCount + 1;
-    console.log('Updated total forms to:', currentFormCount + 1);
     
     // Update exercise numbers
     updateExerciseNumbers();
 }
 
 function removeExercise(button) {
-    console.log('Remove exercise function called');
-    
     const exerciseForm = button.closest('.exercise-form');
     const formset = document.getElementById('exercise-formset');
     
     // Don't remove if it's the only form
     if (formset.querySelectorAll('.exercise-form').length <= 1) {
-        console.log('Cannot remove last exercise form');
         return;
     }
     
     exerciseForm.remove();
-    console.log('Exercise form removed');
     
     // Update total forms count
     const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
@@ -266,6 +264,94 @@ function removeExercise(button) {
     
     // Re-index all forms
     reindexForms();
+}
+
+function addSet(exerciseIndex) {
+    const setsContainer = document.querySelector(`[data-exercise-index="${exerciseIndex}"]`);
+    if (!setsContainer) return;
+    
+    const setForms = setsContainer.querySelectorAll('.set-form');
+    const setIndex = setForms.length;
+    
+    // Clone the first set form
+    const firstSet = setForms[0];
+    const newSet = firstSet.cloneNode(true);
+    
+    // Update set index
+    newSet.setAttribute('data-set-index', setIndex);
+    
+    // Clear values
+    const inputs = newSet.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if (input.type === 'number') {
+            input.value = '';
+        } else if (input.tagName === 'SELECT') {
+            input.selectedIndex = 0;
+        }
+        
+        // Update input names
+        const name = input.getAttribute('name');
+        if (name) {
+            const newName = name.replace(/_set_\d+_/, `_set_${setIndex}_`);
+            input.setAttribute('name', newName);
+        }
+    });
+    
+    // Update set number
+    const setNumber = newSet.querySelector('.set-number');
+    setNumber.textContent = `Set ${setIndex + 1}`;
+    
+    // Show remove button
+    const removeBtn = newSet.querySelector('.btn-remove-set');
+    removeBtn.style.display = 'inline-block';
+    
+    setsContainer.appendChild(newSet);
+    updateSetRemoveButtons(setsContainer);
+}
+
+function removeSet(button) {
+    const setForm = button.closest('.set-form');
+    const setsContainer = setForm.closest('.sets-container');
+    
+    // Don't remove if it's the only set
+    if (setsContainer.querySelectorAll('.set-form').length <= 1) {
+        return;
+    }
+    
+    setForm.remove();
+    updateSetNumbers(setsContainer);
+    updateSetRemoveButtons(setsContainer);
+}
+
+function updateSetNumbers(setsContainer) {
+    const setForms = setsContainer.querySelectorAll('.set-form');
+    setForms.forEach((setForm, index) => {
+        const setNumber = setForm.querySelector('.set-number');
+        setNumber.textContent = `Set ${index + 1}`;
+        setForm.setAttribute('data-set-index', index);
+        
+        // Update input names
+        const inputs = setForm.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            const name = input.getAttribute('name');
+            if (name) {
+                const newName = name.replace(/_set_\d+_/, `_set_${index}_`);
+                input.setAttribute('name', newName);
+            }
+        });
+    });
+}
+
+function updateSetRemoveButtons(setsContainer) {
+    const setForms = setsContainer.querySelectorAll('.set-form');
+    setForms.forEach((setForm, index) => {
+        const removeBtn = setForm.querySelector('.btn-remove-set');
+        if (index === 0 && setForms.length === 1) {
+            removeBtn.style.display = 'none';
+        } else {
+            removeBtn.style.display = 'inline-block';
+        }
+    });
 }
 
 function updateExerciseNumbers() {
@@ -288,7 +374,14 @@ function reindexForms() {
             const name = input.getAttribute('name');
             const id = input.getAttribute('id');
             if (name) {
-                input.setAttribute('name', name.replace(/form-\d+/, `form-${index}`));
+                if (name.startsWith('exercise_')) {
+                    // Handle set inputs
+                    const newName = name.replace(/exercise_\d+/, `exercise_${index}`);
+                    input.setAttribute('name', newName);
+                } else {
+                    // Handle exercise form inputs
+                    input.setAttribute('name', name.replace(/form-\d+/, `form-${index}`));
+                }
             }
             if (id) {
                 input.setAttribute('id', id.replace(/form-\d+/, `form-${index}`));
@@ -302,13 +395,23 @@ function reindexForms() {
                 label.setAttribute('for', forAttr.replace(/form-\d+/, `form-${index}`));
             }
         });
+        
+        // Update sets container
+        const setsContainer = form.querySelector('.sets-container');
+        if (setsContainer) {
+            setsContainer.setAttribute('data-exercise-index', index);
+        }
     });
 }
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Exercise form JavaScript loaded');
     updateExerciseNumbers();
+    
+    // Initialize set remove buttons
+    document.querySelectorAll('.sets-container').forEach(container => {
+        updateSetRemoveButtons(container);
+    });
 });
 </script>
 {% endblock %}
