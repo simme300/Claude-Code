@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Progress Pictures - Claude Code{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Progress Pictures</h1>
+        <p class="subtitle">Track your physique changes over time</p>
+        <div class="header-actions">
+            <a href="{% url 'main:add_progress_picture' %}" class="btn btn-primary">Add New Picture</a>
+        </div>
+    </div>
+    
+    {% if pictures %}
+        <div class="pictures-grid">
+            {% for picture in pictures %}
+                <div class="picture-card">
+                    <div class="picture-image">
+                        <img src="{{ picture.image.url }}" alt="{{ picture.title }}" loading="lazy">
+                    </div>
+                    <div class="picture-info">
+                        <h3>{{ picture.title }}</h3>
+                        <p class="picture-date">{{ picture.date_taken|date:"M d, Y" }}</p>
+                        {% if picture.notes %}
+                            <p class="picture-notes">{{ picture.notes }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-content">
+                <h3>No progress pictures yet</h3>
+                <p>Start tracking your physique changes by adding your first progress picture.</p>
+                <a href="{% url 'main:add_progress_picture' %}" class="btn btn-primary">Add Your First Picture</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.page-header h1 {
+    margin: 0;
+}
+
+.pictures-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.picture-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.picture-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.picture-image {
+    aspect-ratio: 4/3;
+    overflow: hidden;
+}
+
+.picture-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.picture-info {
+    padding: 1rem;
+}
+
+.picture-info h3 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.picture-date {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.picture-notes {
+    color: #555;
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.empty-content h3 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.empty-content p {
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .pictures-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+}
+</style>
+{% endblock %}

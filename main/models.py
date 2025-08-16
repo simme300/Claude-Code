@@ -109,3 +109,19 @@ class Food(models.Model):
     
     def __str__(self):
         return self.name
+
+
+class ProgressPicture(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="progress_pictures")
+    title = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='progress_pictures/')
+    date_taken = models.DateField()
+    notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-date_taken', '-created_at']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.title} ({self.date_taken})"

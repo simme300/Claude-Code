@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, WorkoutForm, CustomAuthenticationForm, ExerciseFormSet, SetFormSet, UserProfileForm
-from .models import UserProfile
+from .forms import SignUpForm, WorkoutForm, CustomAuthenticationForm, ExerciseFormSet, SetFormSet, UserProfileForm, ProgressPictureForm
+from .models import UserProfile, ProgressPicture
 
 
 def index(request):
@@ -134,3 +134,26 @@ def edit_profile(request):
         form = UserProfileForm(instance=user_profile)
     
     return render(request, 'main/edit_profile.html', {'form': form})
+
+
+@login_required
+def progress_pictures(request):
+    """Display all progress pictures for the logged-in user."""
+    pictures = request.user.progress_pictures.all()
+    return render(request, 'main/progress_pictures.html', {'pictures': pictures})
+
+
+@login_required
+def add_progress_picture(request):
+    """Add a new progress picture."""
+    if request.method == 'POST':
+        form = ProgressPictureForm(request.POST, request.FILES)
+        if form.is_valid():
+            picture = form.save(commit=False)
+            picture.user = request.user
+            picture.save()
+            return redirect('main:progress_pictures')
+    else:
+        form = ProgressPictureForm()
+    
+    return render(request, 'main/add_progress_picture.html', {'form': form})

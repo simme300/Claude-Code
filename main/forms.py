@@ -2,7 +2,7 @@ from django import forms
 from django.forms import formset_factory
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Workout, Exercise, Set, UserProfile
+from .models import Workout, Exercise, Set, UserProfile, ProgressPicture
 
 
 class SignUpForm(UserCreationForm):
@@ -121,4 +121,33 @@ class UserProfileForm(forms.ModelForm):
             'current_weight': 'Current Weight',
             'body_fat_percentage': 'Body Fat Percentage (%)',
             'weight_unit': 'Weight Unit'
+        }
+
+
+class ProgressPictureForm(forms.ModelForm):
+    class Meta:
+        model = ProgressPicture
+        fields = ['title', 'image', 'date_taken', 'notes']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter a title for this progress picture'
+            }),
+            'image': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            }),
+            'date_taken': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional notes about this progress picture'
+            })
+        }
+        labels = {
+            'date_taken': 'Date Taken',
+            'notes': 'Notes (Optional)'
         }
