@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Meal - Claude Code{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Add New Meal</h1>
+        <p class="subtitle">Track your nutrition by adding a meal with foods</p>
+    </div>
+    
+    <div class="form-container">
+        <form method="post" class="meal-form">
+            {% csrf_token %}
+            
+            <div class="meal-details">
+                <h3>Meal Information</h3>
+                
+                <div class="form-group">
+                    <label for="{{ meal_form.name.id_for_label }}">{{ meal_form.name.label }}</label>
+                    {{ meal_form.name }}
+                    {% if meal_form.name.errors %}
+                        <div class="error-messages">
+                            {% for error in meal_form.name.errors %}
+                                <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ meal_form.date_consumed.id_for_label }}">{{ meal_form.date_consumed.label }}</label>
+                    {{ meal_form.date_consumed }}
+                    {% if meal_form.date_consumed.errors %}
+                        <div class="error-messages">
+                            {% for error in meal_form.date_consumed.errors %}
+                                <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="foods-section">
+                <h3>Foods in this Meal</h3>
+                <p class="section-description">Add the foods you consumed in this meal with their nutritional information per 100g.</p>
+                
+                {% if food_error %}
+                    <div class="alert alert-error">{{ food_error }}</div>
+                {% endif %}
+                
+                {{ food_formset.management_form }}
+                
+                <div id="food-forms">
+                    {% for form in food_formset %}
+                        <div class="food-form" data-form-index="{{ forloop.counter0 }}">
+                            <h4>Food Item {{ forloop.counter }}</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                        <div class="error-messages">
+                                            {% for error in form.name.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="{{ form.grams.id_for_label }}">{{ form.grams.label }}</label>
+                                    {{ form.grams }}
+                                    {% if form.grams.errors %}
+                                        <div class="error-messages">
+                                            {% for error in form.grams.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="{{ form.calories_per_100g.id_for_label }}">{{ form.calories_per_100g.label }}</label>
+                                    {{ form.calories_per_100g }}
+                                    {% if form.calories_per_100g.errors %}
+                                        <div class="error-messages">
+                                            {% for error in form.calories_per_100g.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="{{ form.carbs_per_100g.id_for_label }}">{{ form.carbs_per_100g.label }}</label>
+                                    {{ form.carbs_per_100g }}
+                                    {% if form.carbs_per_100g.errors %}
+                                        <div class="error-messages">
+                                            {% for error in form.carbs_per_100g.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="{{ form.fat_per_100g.id_for_label }}">{{ form.fat_per_100g.label }}</label>
+                                    {{ form.fat_per_100g }}
+                                    {% if form.fat_per_100g.errors %}
+                                        <div class="error-messages">
+                                            {% for error in form.fat_per_100g.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="{{ form.protein_per_100g.id_for_label }}">{{ form.protein_per_100g.label }}</label>
+                                    {{ form.protein_per_100g }}
+                                    {% if form.protein_per_100g.errors %}
+                                        <div class="error-messages">
+                                            {% for error in form.protein_per_100g.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <button type="button" id="add-food" class="btn btn-outline">Add Another Food Item</button>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Meal</button>
+                <a href="{% url 'main:meal_tracking' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addFoodBtn = document.getElementById('add-food');
+    const foodForms = document.getElementById('food-forms');
+    const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+    
+    let formCount = parseInt(totalForms.value);
+    
+    addFoodBtn.addEventListener('click', function() {
+        const newForm = document.querySelector('.food-form').cloneNode(true);
+        
+        // Update form index
+        newForm.setAttribute('data-form-index', formCount);
+        newForm.querySelector('h4').textContent = `Food Item ${formCount + 1}`;
+        
+        // Update field names and IDs
+        const inputs = newForm.querySelectorAll('input, select');
+        inputs.forEach(function(input) {
+            const name = input.name.replace(/-\d+-/, `-${formCount}-`);
+            const id = input.id.replace(/_\d+_/, `_${formCount}_`);
+            input.name = name;
+            input.id = id;
+            input.value = '';
+        });
+        
+        // Update labels
+        const labels = newForm.querySelectorAll('label');
+        labels.forEach(function(label) {
+            const forAttr = label.getAttribute('for').replace(/_\d+_/, `_${formCount}_`);
+            label.setAttribute('for', forAttr);
+        });
+        
+        foodForms.appendChild(newForm);
+        formCount++;
+        totalForms.value = formCount;
+    });
+});
+</script>
+
+<style>
+.meal-details {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.foods-section {
+    margin-bottom: 24px;
+}
+
+.section-description {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.food-form {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #e0e0e0;
+}
+
+.food-form h4 {
+    margin: 0 0 16px 0;
+    color: #333;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+    color: #333;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    border: 1px solid #f5c6cb;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .meal-details,
+    .food-form {
+        padding: 16px;
+    }
+}
+</style>
+{% endblock %}

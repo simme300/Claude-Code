@@ -22,7 +22,7 @@
                     <a href="{% url 'main:my_workouts' %}" class="nav-link">My Workouts</a>
                     <a href="{% url 'main:create_workout' %}" class="nav-link">Add Workout</a>
                     <a href="{% url 'main:progress_pictures' %}" class="nav-link">Progress Pictures</a>
-                    <a href="#" class="nav-link">Meal Tracking</a>
+                    <a href="{% url 'main:meal_tracking' %}" class="nav-link">Meal Tracking</a>
                     <a href="{% url 'main:logout' %}" class="nav-link">Logout</a>
                 {% else %}
                     <a href="{% url 'main:login' %}" class="nav-link">Login</a>

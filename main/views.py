@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, WorkoutForm, CustomAuthenticationForm, ExerciseFormSet, SetFormSet, UserProfileForm, ProgressPictureForm, GoalForm
-from .models import UserProfile, ProgressPicture, Goal
+from django.forms import formset_factory
+from .forms import SignUpForm, WorkoutForm, CustomAuthenticationForm, ExerciseFormSet, SetFormSet, UserProfileForm, ProgressPictureForm, GoalForm, MealForm, FoodForm, FoodFormSet
+from .models import UserProfile, ProgressPicture, Goal, Meal, Food
 
 
 def index(request):
@@ -252,3 +253,218 @@ def delete_goal(request, goal_id):
     goal = request.user.goals.get(id=goal_id)
     goal.delete()
     return redirect('main:manage_goals')
+
+
+@login_required
+def meal_tracking(request):
+    """Display all meals for the logged-in user with date filtering."""
+    from datetime import datetime, timedelta
+    import datetime as dt
+    
+    # Get date parameter from request, default to today
+    selected_date_str = request.GET.get('date')
+    if selected_date_str:
+        try:
+            selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            selected_date = dt.date.today()
+    else:
+        selected_date = dt.date.today()
+    
+    # Calculate previous and next dates
+    prev_date = selected_date - timedelta(days=1)
+    next_date = selected_date + timedelta(days=1)
+    
+    # Get view mode - 'day' for single day, 'all' for all days
+    view_mode = request.GET.get('view', 'day')
+    
+    if view_mode == 'day':
+        # Show only selected day
+        meals = request.user.meals.filter(date_consumed=selected_date)
+        
+        # Calculate totals for the selected day
+        daily_total = {
+            'calories': 0,
+            'carbs': 0,
+            'fat': 0,
+            'protein': 0,
+            'meals': []
+        }
+        
+        for meal in meals:
+            daily_total['calories'] += meal.total_calories
+            daily_total['carbs'] += meal.total_carbs
+            daily_total['fat'] += meal.total_fat
+            daily_total['protein'] += meal.total_protein
+            daily_total['meals'].append(meal)
+        
+        # Check if user has meals on previous/next days for navigation
+        has_prev_meals = request.user.meals.filter(date_consumed=prev_date).exists()
+        has_next_meals = request.user.meals.filter(date_consumed=next_date).exists()
+        
+        context = {
+            'view_mode': 'day',
+            'selected_date': selected_date,
+            'today': dt.date.today(),
+            'prev_date': prev_date,
+            'next_date': next_date,
+            'has_prev_meals': has_prev_meals,
+            'has_next_meals': has_next_meals,
+            'daily_total': daily_total,
+            'meals': meals,
+        }
+    else:
+        # Show all days (original view)
+        meals = request.user.meals.all()
+        
+        # Calculate daily totals
+        daily_totals = {}
+        for meal in meals:
+            date = meal.date_consumed
+            if date not in daily_totals:
+                daily_totals[date] = {
+                    'calories': 0,
+                    'carbs': 0,
+                    'fat': 0,
+                    'protein': 0,
+                    'meals': []
+                }
+            daily_totals[date]['calories'] += meal.total_calories
+            daily_totals[date]['carbs'] += meal.total_carbs
+            daily_totals[date]['fat'] += meal.total_fat
+            daily_totals[date]['protein'] += meal.total_protein
+            daily_totals[date]['meals'].append(meal)
+        
+        # Sort by date (newest first)
+        sorted_daily_totals = dict(sorted(daily_totals.items(), reverse=True))
+        
+        context = {
+            'view_mode': 'all',
+            'selected_date': selected_date,
+            'today': dt.date.today(),
+            'daily_totals': sorted_daily_totals,
+            'meals': meals,
+        }
+    
+    return render(request, 'main/meal_tracking.html', context)
+
+
+@login_required
+def add_meal(request):
+    """Add a new meal with foods."""
+    if request.method == 'POST':
+        meal_form = MealForm(request.POST)
+        food_formset = FoodFormSet(request.POST)
+        
+        if meal_form.is_valid() and food_formset.is_valid():
+            # Check if at least one food has data
+            valid_foods = []
+            for food_form in food_formset:
+                if food_form.cleaned_data and food_form.cleaned_data.get('name'):
+                    valid_foods.append(food_form)
+            
+            if not valid_foods:
+                food_error = "You must add at least one food item to create a meal."
+                return render(request, 'main/add_meal.html', {
+                    'meal_form': meal_form,
+                    'food_formset': food_formset,
+                    'food_error': food_error
+                })
+            
+            # Save the meal
+            meal = meal_form.save(commit=False)
+            meal.user = request.user
+            meal.save()
+            
+            # Save the foods
+            for food_form in valid_foods:
+                food = food_form.save(commit=False)
+                food.meal = meal
+                food.save()
+            
+            return redirect('main:meal_tracking')
+    else:
+        meal_form = MealForm()
+        food_formset = FoodFormSet()
+    
+    return render(request, 'main/add_meal.html', {
+        'meal_form': meal_form,
+        'food_formset': food_formset
+    })
+
+
+@login_required
+def meal_detail(request, meal_id):
+    """Display detailed view of a specific meal."""
+    meal = request.user.meals.get(id=meal_id)
+    foods = meal.foods.all()
+    
+    context = {
+        'meal': meal,
+        'foods': foods,
+    }
+    
+    return render(request, 'main/meal_detail.html', context)
+
+
+@login_required
+def edit_meal(request, meal_id):
+    """Edit an existing meal."""
+    meal = request.user.meals.get(id=meal_id)
+    
+    if request.method == 'POST':
+        meal_form = MealForm(request.POST, instance=meal)
+        
+        # Create formset with existing foods
+        FoodFormSetWithExtra = formset_factory(FoodForm, extra=1, can_delete=True)
+        food_formset = FoodFormSetWithExtra(request.POST, initial=[{
+            'name': food.name,
+            'grams': food.grams,
+            'calories_per_100g': food.calories_per_100g,
+            'carbs_per_100g': food.carbs_per_100g,
+            'fat_per_100g': food.fat_per_100g,
+            'protein_per_100g': food.protein_per_100g,
+        } for food in meal.foods.all()])
+        
+        if meal_form.is_valid() and food_formset.is_valid():
+            # Update the meal
+            meal_form.save()
+            
+            # Delete existing foods and create new ones
+            meal.foods.all().delete()
+            
+            # Save new foods
+            for food_form in food_formset:
+                if food_form.cleaned_data and food_form.cleaned_data.get('name') and not food_form.cleaned_data.get('DELETE'):
+                    food = food_form.save(commit=False)
+                    food.meal = meal
+                    food.save()
+            
+            return redirect('main:meal_detail', meal_id=meal.id)
+    else:
+        meal_form = MealForm(instance=meal)
+        
+        # Create formset with existing foods
+        FoodFormSetWithExtra = formset_factory(FoodForm, extra=1, can_delete=True)
+        food_formset = FoodFormSetWithExtra(initial=[{
+            'name': food.name,
+            'grams': food.grams,
+            'calories_per_100g': food.calories_per_100g,
+            'carbs_per_100g': food.carbs_per_100g,
+            'fat_per_100g': food.fat_per_100g,
+            'protein_per_100g': food.protein_per_100g,
+        } for food in meal.foods.all()])
+    
+    return render(request, 'main/edit_meal.html', {
+        'meal_form': meal_form,
+        'food_formset': food_formset,
+        'meal': meal
+    })
+
+
+@login_required
+def delete_meal(request, meal_id):
+    """Delete a meal."""
+    meal = request.user.meals.get(id=meal_id)
+    meal.delete()
+    return redirect('main:meal_tracking')

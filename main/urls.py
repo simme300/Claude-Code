@@ -20,4 +20,9 @@ urlpatterns = [
     path('goals/<int:goal_id>/edit/', views.edit_goal, name='edit_goal'),
     path('goals/<int:goal_id>/toggle/', views.toggle_goal_completion, name='toggle_goal_completion'),
     path('goals/<int:goal_id>/delete/', views.delete_goal, name='delete_goal'),
+    path('meals/', views.meal_tracking, name='meal_tracking'),
+    path('meals/add/', views.add_meal, name='add_meal'),
+    path('meals/<int:meal_id>/', views.meal_detail, name='meal_detail'),
+    path('meals/<int:meal_id>/edit/', views.edit_meal, name='edit_meal'),
+    path('meals/<int:meal_id>/delete/', views.delete_meal, name='delete_meal'),
 ]
