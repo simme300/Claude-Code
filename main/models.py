@@ -90,25 +90,71 @@ class Set(models.Model):
 
 class Meal(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="meals")
-    name = models.CharField(max_length=30)
-    calories = models.IntegerField(validators=[MinValueValidator(0)])
-    
-    
+    name = models.CharField(max_length=50)
+    date_consumed = models.DateField(auto_now_add=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    @property
+    def total_calories(self):
+        """Calculate total calories from all foods in this meal."""
+        return sum(food.total_calories for food in self.foods.all())
+    
+    @property
+    def total_carbs(self):
+        """Calculate total carbs from all foods in this meal."""
+        return sum(food.total_carbs for food in self.foods.all())
+    
+    @property
+    def total_fat(self):
+        """Calculate total fat from all foods in this meal."""
+        return sum(food.total_fat for food in self.foods.all())
+    
+    @property
+    def total_protein(self):
+        """Calculate total protein from all foods in this meal."""
+        return sum(food.total_protein for food in self.foods.all())
+    
+    class Meta:
+        ordering = ['-date_consumed', '-created_at']
     
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.date_consumed}"
 
 
 class Food(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=50)
     meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name="foods")
-    grams = models.IntegerField(validators=[MinValueValidator(0)])
+    grams = models.DecimalField(max_digits=6, decimal_places=1, validators=[MinValueValidator(0)])
+    
+    # Nutritional values per 100g
+    calories_per_100g = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    carbs_per_100g = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    fat_per_100g = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    protein_per_100g = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    
+    @property
+    def total_calories(self):
+        """Calculate total calories for this food item based on grams."""
+        return (self.calories_per_100g * self.grams) / 100
+    
+    @property
+    def total_carbs(self):
+        """Calculate total carbs for this food item based on grams."""
+        return (self.carbs_per_100g * self.grams) / 100
+    
+    @property
+    def total_fat(self):
+        """Calculate total fat for this food item based on grams."""
+        return (self.fat_per_100g * self.grams) / 100
+    
+    @property
+    def total_protein(self):
+        """Calculate total protein for this food item based on grams."""
+        return (self.protein_per_100g * self.grams) / 100
     
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.grams}g)"
 
 
 class ProgressPicture(models.Model):

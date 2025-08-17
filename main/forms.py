@@ -2,7 +2,7 @@ from django import forms
 from django.forms import formset_factory
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Workout, Exercise, Set, UserProfile, ProgressPicture, Goal
+from .models import Workout, Exercise, Set, UserProfile, ProgressPicture, Goal, Meal, Food
 
 
 class SignUpForm(UserCreationForm):
@@ -192,3 +192,89 @@ class GoalForm(forms.ModelForm):
             'unit': 'Unit',
             'target_date': 'Target Date (Optional)'
         }
+
+
+class MealForm(forms.ModelForm):
+    date_consumed = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        }),
+        label='Date Consumed',
+        required=False
+    )
+    
+    class Meta:
+        model = Meal
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter meal name (e.g., "Breakfast", "Post-workout snack")'
+            })
+        }
+        labels = {
+            'name': 'Meal Name'
+        }
+    
+    def save(self, commit=True):
+        meal = super().save(commit=False)
+        if self.cleaned_data.get('date_consumed'):
+            meal.date_consumed = self.cleaned_data['date_consumed']
+        if commit:
+            meal.save()
+        return meal
+
+
+class FoodForm(forms.ModelForm):
+    class Meta:
+        model = Food
+        fields = ['name', 'grams', 'calories_per_100g', 'carbs_per_100g', 'fat_per_100g', 'protein_per_100g']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter food name (e.g., "Chicken breast", "Brown rice")'
+            }),
+            'grams': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.1',
+                'placeholder': 'Weight in grams'
+            }),
+            'calories_per_100g': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01',
+                'placeholder': 'Calories per 100g'
+            }),
+            'carbs_per_100g': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01',
+                'placeholder': 'Carbs per 100g'
+            }),
+            'fat_per_100g': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01',
+                'placeholder': 'Fat per 100g'
+            }),
+            'protein_per_100g': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01',
+                'placeholder': 'Protein per 100g'
+            })
+        }
+        labels = {
+            'name': 'Food Name',
+            'grams': 'Weight (grams)',
+            'calories_per_100g': 'Calories per 100g',
+            'carbs_per_100g': 'Carbs per 100g',
+            'fat_per_100g': 'Fat per 100g',
+            'protein_per_100g': 'Protein per 100g'
+        }
+
+
+# Create a formset for foods in a meal
+FoodFormSet = formset_factory(FoodForm, extra=1, can_delete=True)
