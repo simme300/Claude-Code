@@ -14,6 +14,11 @@
         <strong>Complete your profile!</strong> 
         <a href="{% url 'main:edit_profile' %}">Add your age and weight</a> to get personalized insights.
     </div>
+    {% elif bmr_incomplete %}
+    <div class="alert alert-info">
+        <strong>Add your gender!</strong> 
+        <a href="{% url 'main:edit_profile' %}">Complete your profile</a> to calculate your Basal Metabolic Rate (BMR).
+    </div>
     {% endif %}
     
     <div class="stats-overview">
@@ -45,11 +50,76 @@
             </div>
             {% endif %}
             
+            {% if user_profile.calculate_bmr %}
+            <div class="stat-card bmr-card">
+                <h3>{{ user_profile.calculate_bmr|floatformat:0 }}</h3>
+                <p>BMR (cal/day)</p>
+                <small>Estimate only</small>
+            </div>
+            {% endif %}
+            
+            {% if calorie_summary.tdee %}
+            <div class="stat-card">
+                <h3>{{ calorie_summary.tdee|floatformat:0 }}</h3>
+                <p>TDEE (cal/day)</p>
+                <small>Total Daily Energy</small>
+            </div>
+            {% endif %}
+            
             <div class="stat-card">
                 <a href="{% url 'main:edit_profile' %}" class="btn btn-sm btn-outline">Edit Profile</a>
             </div>
         </div>
     </div>
+    
+    {% if calorie_summary.daily_target %}
+    <div class="calorie-targets-section">
+        <h2>Your Calorie Targets</h2>
+        <div class="calorie-cards">
+            <div class="calorie-card daily">
+                <h3>{{ calorie_summary.daily_target|floatformat:0 }}</h3>
+                <p>Daily Target</p>
+                <small>calories per day</small>
+            </div>
+            
+            {% if calorie_summary.adjusted_daily and calorie_summary.adjusted_daily != calorie_summary.daily_target %}
+            <div class="calorie-card adjusted">
+                <h3>{{ calorie_summary.adjusted_daily|floatformat:0 }}</h3>
+                <p>Adjusted Daily</p>
+                <small>based on recent eating</small>
+            </div>
+            {% endif %}
+            
+            {% if calorie_summary.weekly_target %}
+            <div class="calorie-card weekly">
+                <h3>{{ calorie_summary.weekly_target|floatformat:0 }}</h3>
+                <p>Weekly Target</p>
+                <small>calories per week</small>
+            </div>
+            {% endif %}
+            
+            {% if calorie_summary.monthly_target %}
+            <div class="calorie-card monthly">
+                <h3>{{ calorie_summary.monthly_target|floatformat:0 }}</h3>
+                <p>Monthly Target</p>
+                <small>calories per month</small>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="calorie-info">
+            <p><strong>💡 How it works:</strong> Your daily calorie target is calculated based on your BMR, activity level, and weight goals. The adjusted daily target adapts based on your recent eating patterns to keep you on track with your weekly goals.</p>
+        </div>
+    </div>
+    {% elif user_profile.target_weight %}
+    <div class="calorie-incomplete">
+        <h2>Calorie Targets</h2>
+        <div class="alert alert-info">
+            <strong>Almost ready!</strong> 
+            <a href="{% url 'main:edit_profile' %}">Complete your profile</a> to see personalized calorie targets.
+        </div>
+    </div>
+    {% endif %}
     
     {% if active_goals %}
     <div class="goals-section">

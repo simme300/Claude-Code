@@ -92,13 +92,16 @@ SetFormSet = formset_factory(SetForm, extra=1, can_delete=True)
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['age', 'current_weight', 'body_fat_percentage', 'weight_unit']
+        fields = ['age', 'gender', 'current_weight', 'body_fat_percentage', 'weight_unit', 'target_weight', 'weight_loss_rate', 'activity_level']
         widgets = {
             'age': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '13',
                 'max': '120',
                 'placeholder': 'Enter your age'
+            }),
+            'gender': forms.Select(attrs={
+                'class': 'form-control'
             }),
             'current_weight': forms.NumberInput(attrs={
                 'class': 'form-control',
@@ -115,12 +118,38 @@ class UserProfileForm(forms.ModelForm):
             }),
             'weight_unit': forms.Select(attrs={
                 'class': 'form-control'
+            }),
+            'target_weight': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01',
+                'placeholder': 'Enter your target weight (optional)'
+            }),
+            'weight_loss_rate': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.1',
+                'max': '2.0',
+                'step': '0.1',
+                'placeholder': '0.5'
+            }),
+            'activity_level': forms.Select(attrs={
+                'class': 'form-control'
             })
         }
         labels = {
+            'age': 'Age',
+            'gender': 'Gender',
             'current_weight': 'Current Weight',
             'body_fat_percentage': 'Body Fat Percentage (%)',
-            'weight_unit': 'Weight Unit'
+            'weight_unit': 'Weight Unit',
+            'target_weight': 'Target Weight (Optional)',
+            'weight_loss_rate': 'Weight Change Rate (kg/week)',
+            'activity_level': 'Activity Level'
+        }
+        help_texts = {
+            'weight_loss_rate': 'How much weight do you want to lose/gain per week (0.1-2.0 kg)',
+            'activity_level': 'Select your typical physical activity level',
+            'target_weight': 'Your goal weight for calorie calculations'
         }
 
 

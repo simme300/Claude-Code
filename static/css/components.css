@@ -158,9 +158,95 @@
   font-size: 0.9rem;
 }
 
+/* Calorie Targets Section */
+.calorie-targets-section {
+  margin-bottom: 3rem;
+}
+
+.calorie-targets-section h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.calorie-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.calorie-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.calorie-card.daily {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.calorie-card.adjusted {
+  background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
+}
+
+.calorie-card.weekly {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.calorie-card.monthly {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: #333;
+}
+
+.calorie-card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.calorie-card p {
+  margin: 0 0 0.25rem 0;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.calorie-card small {
+  opacity: 0.8;
+  font-size: 0.8rem;
+}
+
+.calorie-info {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.calorie-incomplete {
+  margin-bottom: 3rem;
+}
+
+.calorie-incomplete h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
 /* Responsive adjustments for components */
 @media (max-width: 768px) {
   .action-cards {
     grid-template-columns: 1fr;
+  }
+  
+  .calorie-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .calorie-card h3 {
+    font-size: 1.5rem;
   }
 }

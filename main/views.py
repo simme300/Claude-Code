@@ -54,11 +54,19 @@ def homepage(request):
     # Get user's active goals
     active_goals = request.user.goals.filter(is_active=True)[:3]  # Show max 3 goals
     
+    # Check if profile is complete for BMR calculation
+    bmr_incomplete = not (user_profile.age and user_profile.current_weight and user_profile.gender)
+    
+    # Get calorie summary for the user
+    calorie_summary = user_profile.get_calorie_summary()
+    
     context = {
         'user_profile': user_profile,
         'total_workouts': total_workouts,
         'profile_incomplete': not (user_profile.age and user_profile.current_weight),
+        'bmr_incomplete': bmr_incomplete,
         'active_goals': active_goals,
+        'calorie_summary': calorie_summary,
     }
     
     return render(request, 'main/homepage.html', context)
