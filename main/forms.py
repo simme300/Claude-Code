@@ -2,7 +2,7 @@ from django import forms
 from django.forms import formset_factory
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Workout, Exercise, Set, UserProfile, ProgressPicture
+from .models import Workout, Exercise, Set, UserProfile, ProgressPicture, Goal
 
 
 class SignUpForm(UserCreationForm):
@@ -150,4 +150,45 @@ class ProgressPictureForm(forms.ModelForm):
         labels = {
             'date_taken': 'Date Taken',
             'notes': 'Notes (Optional)'
+        }
+
+
+class GoalForm(forms.ModelForm):
+    class Meta:
+        model = Goal
+        fields = ['title', 'description', 'goal_type', 'target_value', 'unit', 'target_date']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your goal (e.g., "Lose 10kgs", "Bench 100kg")'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Describe your goal in more detail (optional)'
+            }),
+            'goal_type': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'target_value': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01',
+                'placeholder': 'Target value (optional)'
+            }),
+            'unit': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'target_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            })
+        }
+        labels = {
+            'title': 'Goal Title',
+            'description': 'Description (Optional)',
+            'goal_type': 'Goal Type',
+            'target_value': 'Target Value (Optional)',
+            'unit': 'Unit',
+            'target_date': 'Target Date (Optional)'
         }

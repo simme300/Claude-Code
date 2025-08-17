@@ -50,5 +50,46 @@
             </div>
         </div>
     </div>
+    
+    {% if active_goals %}
+    <div class="goals-section">
+        <h2>Your Active Goals</h2>
+        <div class="goals-list">
+            {% for goal in active_goals %}
+            <div class="goal-card">
+                <div class="goal-header">
+                    <h3>{{ goal.title }}</h3>
+                    <span class="goal-type">{{ goal.get_goal_type_display }}</span>
+                </div>
+                {% if goal.description %}
+                <p class="goal-description">{{ goal.description }}</p>
+                {% endif %}
+                {% if goal.target_value and goal.unit %}
+                <div class="goal-target">
+                    <strong>Target:</strong> {{ goal.target_value }} {{ goal.get_unit_display }}
+                </div>
+                {% endif %}
+                {% if goal.target_date %}
+                <div class="goal-date">
+                    <strong>Target Date:</strong> {{ goal.target_date|date:"M d, Y" }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="goals-actions">
+            <a href="{% url 'main:add_goal' %}" class="btn btn-primary">Add New Goal</a>
+            <a href="{% url 'main:manage_goals' %}" class="btn btn-outline">Manage Goals</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="goals-section">
+        <h2>Your Goals</h2>
+        <div class="empty-goals">
+            <p>You haven't set any goals yet. Start by adding your first fitness goal!</p>
+            <a href="{% url 'main:add_goal' %}" class="btn btn-primary">Add Your First Goal</a>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

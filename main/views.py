@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, WorkoutForm, CustomAuthenticationForm, ExerciseFormSet, SetFormSet, UserProfileForm, ProgressPictureForm
-from .models import UserProfile, ProgressPicture
+from .forms import SignUpForm, WorkoutForm, CustomAuthenticationForm, ExerciseFormSet, SetFormSet, UserProfileForm, ProgressPictureForm, GoalForm
+from .models import UserProfile, ProgressPicture, Goal
 
 
 def index(request):
@@ -50,10 +50,14 @@ def homepage(request):
     # Calculate basic stats
     total_workouts = request.user.workouts.count()
     
+    # Get user's active goals
+    active_goals = request.user.goals.filter(is_active=True)[:3]  # Show max 3 goals
+    
     context = {
         'user_profile': user_profile,
         'total_workouts': total_workouts,
         'profile_incomplete': not (user_profile.age and user_profile.current_weight),
+        'active_goals': active_goals,
     }
     
     return render(request, 'main/homepage.html', context)
@@ -187,3 +191,64 @@ def add_progress_picture(request):
         form = ProgressPictureForm()
     
     return render(request, 'main/add_progress_picture.html', {'form': form})
+
+
+@login_required
+def add_goal(request):
+    """Add a new goal."""
+    if request.method == 'POST':
+        form = GoalForm(request.POST)
+        if form.is_valid():
+            goal = form.save(commit=False)
+            goal.user = request.user
+            goal.save()
+            return redirect('main:homepage')
+    else:
+        form = GoalForm()
+    
+    return render(request, 'main/add_goal.html', {'form': form})
+
+
+@login_required
+def manage_goals(request):
+    """Display and manage all goals for the logged-in user."""
+    goals = request.user.goals.all()
+    return render(request, 'main/manage_goals.html', {'goals': goals})
+
+
+@login_required
+def edit_goal(request, goal_id):
+    """Edit an existing goal."""
+    goal = request.user.goals.get(id=goal_id)
+    
+    if request.method == 'POST':
+        form = GoalForm(request.POST, instance=goal)
+        if form.is_valid():
+            form.save()
+            return redirect('main:manage_goals')
+    else:
+        form = GoalForm(instance=goal)
+    
+    return render(request, 'main/edit_goal.html', {'form': form, 'goal': goal})
+
+
+@login_required
+def toggle_goal_completion(request, goal_id):
+    """Toggle goal completion status."""
+    goal = request.user.goals.get(id=goal_id)
+    goal.is_completed = not goal.is_completed
+    if goal.is_completed:
+        from django.utils import timezone
+        goal.completed_date = timezone.now().date()
+    else:
+        goal.completed_date = None
+    goal.save()
+    return redirect('main:manage_goals')
+
+
+@login_required
+def delete_goal(request, goal_id):
+    """Delete a goal."""
+    goal = request.user.goals.get(id=goal_id)
+    goal.delete()
+    return redirect('main:manage_goals')

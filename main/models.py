@@ -125,3 +125,56 @@ class ProgressPicture(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.title} ({self.date_taken})"
+
+
+class Goal(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="goals")
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    target_value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    
+    WEIGHT_LOSS = "weight_loss"
+    WEIGHT_GAIN = "weight_gain"
+    BODY_FAT = "body_fat"
+    STRENGTH = "strength"
+    ENDURANCE = "endurance"
+    GENERAL = "general"
+    
+    GOAL_TYPE_CHOICES = [
+        (WEIGHT_LOSS, "Weight Loss"),
+        (WEIGHT_GAIN, "Weight Gain"),
+        (BODY_FAT, "Body Fat Percentage"),
+        (STRENGTH, "Strength Goal"),
+        (ENDURANCE, "Endurance Goal"),
+        (GENERAL, "General Goal"),
+    ]
+    
+    goal_type = models.CharField(max_length=20, choices=GOAL_TYPE_CHOICES, default=GENERAL)
+    
+    LBS = "Lbs"
+    KG = "Kg"
+    PERCENTAGE = "%"
+    REPS = "reps"
+    CUSTOM = "custom"
+    
+    UNIT_CHOICES = [
+        (LBS, "Lbs"),
+        (KG, "Kg"),
+        (PERCENTAGE, "%"),
+        (REPS, "Reps"),
+        (CUSTOM, "Custom"),
+    ]
+    
+    unit = models.CharField(max_length=10, choices=UNIT_CHOICES, default=CUSTOM)
+    target_date = models.DateField(null=True, blank=True)
+    is_completed = models.BooleanField(default=False)
+    completed_date = models.DateField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-is_active', '-created_at']
+    
+    def __str__(self):
+        return self.title
