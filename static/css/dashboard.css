@@ -1,0 +1,620 @@
+/* Dashboard Styles */
+
+.dashboard-container {
+  width: 100%;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem 1rem;
+  overflow: hidden;
+}
+
+/* Header Section */
+.dashboard-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.welcome-section {
+  text-align: center;
+}
+
+.welcome-section h1 {
+  margin: 0 0 0.125rem 0;
+  font-size: 1.6rem;
+  color: #333;
+  font-weight: 700;
+}
+
+.dashboard-subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+/* Alerts Section */
+.alerts-section {
+  margin-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+
+.alert {
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid;
+}
+
+.alert-warning {
+  background: #fff3cd;
+  border-color: #ffeaa7;
+  color: #856404;
+}
+
+.alert-info {
+  background: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+}
+
+.alert a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem 0.5rem 1rem;
+  border-bottom: 1px solid #f1f3f4;
+  flex-shrink: 0;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.edit-link, .view-all-link {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.edit-link:hover, .view-all-link:hover {
+  text-decoration: underline;
+}
+
+/* User Information Card */
+.user-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5rem;
+  padding: 0.75rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  min-height: 50px;
+}
+
+.info-item .label {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-item .value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Workout Statistics Card */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.5rem;
+  padding: 0.75rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 4px;
+  min-height: 60px;
+}
+
+.stat-number {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.125rem;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  opacity: 0.9;
+}
+
+/* Calorie Targets Card */
+.calorie-targets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5rem;
+  padding: 0.75rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.calorie-target {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 4px;
+  color: white;
+  min-height: 60px;
+}
+
+.calorie-target.daily {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.calorie-target.adjusted {
+  background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
+}
+
+.calorie-target.weekly {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.calorie-target.monthly {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: #333;
+}
+
+.calorie-number {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0.125rem;
+}
+
+.calorie-label {
+  font-size: 0.7rem;
+  opacity: 0.9;
+}
+
+/* Goals Progress Card */
+.goals-progress-list, .goals-list {
+  padding: 0.75rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.goal-progress-item, .goal-item {
+  padding: 0.75rem;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  background: #f8f9fa;
+}
+
+.goal-progress-item:last-child, .goal-item:last-child {
+  margin-bottom: 0;
+}
+
+.goal-info {
+  margin-bottom: 0.75rem;
+}
+
+.goal-info h4 {
+  margin: 0 0 0.25rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.goal-type {
+  display: inline-block;
+  background: #007bff;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.progress-section {
+  margin-bottom: 0.75rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.progress-percentage {
+  font-weight: 600;
+  color: #333;
+}
+
+.progress-values {
+  color: #666;
+}
+
+.goal-status {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.status-completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-in_progress {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-not_started {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.goal-target, .goal-date {
+  margin-bottom: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Quick Stats Card */
+.quick-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+  padding: 0.75rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.quick-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+}
+
+.stat-icon {
+  font-size: 1.25rem;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.125rem;
+}
+
+.stat-desc {
+  font-size: 0.7rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Recent Activity Card */
+.activity-list {
+  padding: 0.75rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-icon {
+  font-size: 1.25rem;
+  width: 32px;
+  text-align: center;
+}
+
+.activity-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-text {
+  color: #333;
+  font-size: 0.85rem;
+  margin-bottom: 0.125rem;
+}
+
+.activity-time {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+/* Empty State */
+.empty-state {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.empty-state p {
+  margin-bottom: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1400px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .dashboard-container {
+    padding: 0.25rem 0.5rem;
+    height: 100vh;
+  }
+  
+  .dashboard-header {
+    padding: 0.5rem 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .welcome-section h1 {
+    font-size: 1.4rem;
+  }
+  
+  .dashboard-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(6, minmax(180px, 1fr));
+    gap: 0.5rem;
+  }
+  
+  .user-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0.5rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    padding: 0.5rem;
+  }
+  
+  .calorie-targets-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0.5rem;
+  }
+  
+  .quick-stats-grid {
+    grid-template-columns: 1fr;
+    padding: 0.5rem;
+  }
+  
+  .goals-progress-list, .goals-list, .activity-list {
+    padding: 0.5rem;
+  }
+  
+  .progress-text {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 0.125rem 0.25rem;
+    height: 100vh;
+  }
+  
+  .dashboard-header {
+    padding: 0.25rem 0;
+    margin-bottom: 0.25rem;
+  }
+  
+  .welcome-section h1 {
+    font-size: 1.2rem;
+  }
+  
+  .dashboard-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .card-header {
+    padding: 0.5rem;
+  }
+  
+  .card-header h2 {
+    font-size: 0.9rem;
+  }
+  
+  .user-info-grid,
+  .stats-grid,
+  .calorie-targets-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem;
+    padding: 0.5rem;
+  }
+  
+  .quick-stats-grid,
+  .activity-list,
+  .goals-progress-list,
+  .goals-list {
+    padding: 0.5rem;
+  }
+  
+  .stat-number {
+    font-size: 1rem;
+  }
+  
+  .calorie-number {
+    font-size: 0.9rem;
+  }
+  
+  .stat-value {
+    font-size: 0.9rem;
+  }
+  
+  .dashboard-grid {
+    grid-template-rows: repeat(6, minmax(160px, 1fr));
+    gap: 0.25rem;
+  }
+}
+
+/* Special styling for specific dashboard cards */
+.user-info-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.user-info-card .card-header {
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.user-info-card .card-header h2 {
+  color: white;
+}
+
+.user-info-card .edit-link {
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.user-info-card .edit-link:hover {
+  background: rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+}
+
+.user-info-card .info-item {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-info-card .info-item .label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.user-info-card .info-item .value {
+  color: white;
+}
+
+/* Hover effects */
+.dashboard-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-item, .calorie-target, .quick-stat {
+  transition: transform 0.2s ease;
+}
+
+.stat-item:hover, .calorie-target:hover, .quick-stat:hover {
+  transform: translateY(-1px);
+}

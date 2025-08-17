@@ -1,165 +1,302 @@
 {% extends 'base.html' %}
 
-{% block title %}Homepage - Claude Code{% endblock %}
+{% block title %}Dashboard - Claude Code{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="homepage-header">
-        <h1>Welcome back, {{ user.username }}!</h1>
-        <p class="subtitle">Track your fitness journey</p>
-    </div>
-    
-    {% if profile_incomplete %}
-    <div class="alert alert-info">
-        <strong>Complete your profile!</strong> 
-        <a href="{% url 'main:edit_profile' %}">Add your age and weight</a> to get personalized insights.
-    </div>
-    {% elif bmr_incomplete %}
-    <div class="alert alert-info">
-        <strong>Add your gender!</strong> 
-        <a href="{% url 'main:edit_profile' %}">Complete your profile</a> to calculate your Basal Metabolic Rate (BMR).
-    </div>
-    {% endif %}
-    
-    <div class="stats-overview">
-        <h2>Your Stats</h2>
-        <div class="stats-cards">
-            <div class="stat-card">
-                <h3>{{ total_workouts }}</h3>
-                <p>Total Workouts</p>
-            </div>
-            
-            {% if user_profile.age %}
-            <div class="stat-card">
-                <h3>{{ user_profile.age }}</h3>
-                <p>Age</p>
-            </div>
-            {% endif %}
-            
-            {% if user_profile.current_weight %}
-            <div class="stat-card">
-                <h3>{{ user_profile.current_weight }} {{ user_profile.weight_unit }}</h3>
-                <p>Current Weight</p>
-            </div>
-            {% endif %}
-            
-            {% if user_profile.body_fat_percentage %}
-            <div class="stat-card">
-                <h3>{{ user_profile.body_fat_percentage }}%</h3>
-                <p>Body Fat</p>
-            </div>
-            {% endif %}
-            
-            {% if user_profile.calculate_bmr %}
-            <div class="stat-card bmr-card">
-                <h3>{{ user_profile.calculate_bmr|floatformat:0 }}</h3>
-                <p>BMR (cal/day)</p>
-                <small>Estimate only</small>
-            </div>
-            {% endif %}
-            
-            {% if calorie_summary.tdee %}
-            <div class="stat-card">
-                <h3>{{ calorie_summary.tdee|floatformat:0 }}</h3>
-                <p>TDEE (cal/day)</p>
-                <small>Total Daily Energy</small>
-            </div>
-            {% endif %}
-            
-            <div class="stat-card">
-                <a href="{% url 'main:edit_profile' %}" class="btn btn-sm btn-outline">Edit Profile</a>
-            </div>
+<div class="dashboard-container">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="welcome-section">
+            <h1>Welcome back, {{ user_info.name }}!</h1>
+            <p class="dashboard-subtitle">Your fitness dashboard</p>
         </div>
     </div>
     
-    {% if calorie_summary.daily_target %}
-    <div class="calorie-targets-section">
-        <h2>Your Calorie Targets</h2>
-        <div class="calorie-cards">
-            <div class="calorie-card daily">
-                <h3>{{ calorie_summary.daily_target|floatformat:0 }}</h3>
-                <p>Daily Target</p>
-                <small>calories per day</small>
-            </div>
-            
-            {% if calorie_summary.adjusted_daily and calorie_summary.adjusted_daily != calorie_summary.daily_target %}
-            <div class="calorie-card adjusted">
-                <h3>{{ calorie_summary.adjusted_daily|floatformat:0 }}</h3>
-                <p>Adjusted Daily</p>
-                <small>based on recent eating</small>
-            </div>
-            {% endif %}
-            
-            {% if calorie_summary.weekly_target %}
-            <div class="calorie-card weekly">
-                <h3>{{ calorie_summary.weekly_target|floatformat:0 }}</h3>
-                <p>Weekly Target</p>
-                <small>calories per week</small>
-            </div>
-            {% endif %}
-            
-            {% if calorie_summary.monthly_target %}
-            <div class="calorie-card monthly">
-                <h3>{{ calorie_summary.monthly_target|floatformat:0 }}</h3>
-                <p>Monthly Target</p>
-                <small>calories per month</small>
-            </div>
-            {% endif %}
+    <!-- Alert Section for Incomplete Profile -->
+    {% if profile_incomplete or bmr_incomplete or goals_incomplete %}
+    <div class="alerts-section">
+        {% if profile_incomplete %}
+        <div class="alert alert-warning">
+            <strong>📋 Complete your profile!</strong> 
+            <a href="{% url 'main:edit_profile' %}">Add your age and weight</a> to get personalized insights.
         </div>
-        
-        <div class="calorie-info">
-            <p><strong>💡 How it works:</strong> Your daily calorie target is calculated based on your BMR, activity level, and weight goals. The adjusted daily target adapts based on your recent eating patterns to keep you on track with your weekly goals.</p>
-        </div>
-    </div>
-    {% elif user_profile.target_weight %}
-    <div class="calorie-incomplete">
-        <h2>Calorie Targets</h2>
+        {% elif bmr_incomplete %}
         <div class="alert alert-info">
-            <strong>Almost ready!</strong> 
-            <a href="{% url 'main:edit_profile' %}">Complete your profile</a> to see personalized calorie targets.
+            <strong>⚖️ Add your gender!</strong> 
+            <a href="{% url 'main:edit_profile' %}">Complete your profile</a> to calculate your BMR.
         </div>
+        {% endif %}
+        {% if goals_incomplete %}
+        <div class="alert alert-info">
+            <strong>🎯 Set your first goal!</strong> 
+            <a href="{% url 'main:add_goal' %}">Add a fitness goal</a> to track your progress.
+        </div>
+        {% endif %}
     </div>
     {% endif %}
-    
-    {% if active_goals %}
-    <div class="goals-section">
-        <h2>Your Active Goals</h2>
-        <div class="goals-list">
-            {% for goal in active_goals %}
-            <div class="goal-card">
-                <div class="goal-header">
-                    <h3>{{ goal.title }}</h3>
-                    <span class="goal-type">{{ goal.get_goal_type_display }}</span>
-                </div>
-                {% if goal.description %}
-                <p class="goal-description">{{ goal.description }}</p>
-                {% endif %}
-                {% if goal.target_value and goal.unit %}
-                <div class="goal-target">
-                    <strong>Target:</strong> {{ goal.target_value }} {{ goal.get_unit_display }}
+
+    <!-- Main Dashboard Grid -->
+    <div class="dashboard-grid">
+        
+        <!-- User Information Card -->
+        <div class="dashboard-card user-info-card">
+            <div class="card-header">
+                <h2>👤 Your Information</h2>
+                <a href="{% url 'main:edit_profile' %}" class="edit-link">Edit</a>
+            </div>
+            <div class="user-info-grid">
+                {% if user_info.age %}
+                <div class="info-item">
+                    <span class="label">Age</span>
+                    <span class="value">{{ user_info.age }} years</span>
                 </div>
                 {% endif %}
-                {% if goal.target_date %}
-                <div class="goal-date">
-                    <strong>Target Date:</strong> {{ goal.target_date|date:"M d, Y" }}
+                {% if user_info.gender %}
+                <div class="info-item">
+                    <span class="label">Gender</span>
+                    <span class="value">{{ user_info.gender }}</span>
+                </div>
+                {% endif %}
+                {% if user_info.weight %}
+                <div class="info-item">
+                    <span class="label">Weight</span>
+                    <span class="value">{{ user_info.weight }} {{ user_info.weight_unit }}</span>
+                </div>
+                {% endif %}
+                {% if user_info.body_fat %}
+                <div class="info-item">
+                    <span class="label">Body Fat</span>
+                    <span class="value">{{ user_info.body_fat }}%</span>
+                </div>
+                {% endif %}
+                {% if user_info.bmr %}
+                <div class="info-item">
+                    <span class="label">BMR</span>
+                    <span class="value">{{ user_info.bmr|floatformat:0 }} cal/day</span>
+                </div>
+                {% endif %}
+                {% if user_info.tdee %}
+                <div class="info-item">
+                    <span class="label">TDEE</span>
+                    <span class="value">{{ user_info.tdee|floatformat:0 }} cal/day</span>
                 </div>
                 {% endif %}
             </div>
-            {% endfor %}
         </div>
-        <div class="goals-actions">
-            <a href="{% url 'main:add_goal' %}" class="btn btn-primary">Add New Goal</a>
-            <a href="{% url 'main:manage_goals' %}" class="btn btn-outline">Manage Goals</a>
+
+        <!-- Workout Statistics Card -->
+        <div class="dashboard-card workout-stats-card">
+            <div class="card-header">
+                <h2>💪 Workout Statistics</h2>
+                <a href="{% url 'main:my_workouts' %}" class="view-all-link">View All</a>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">{{ workout_stats.total_workouts }}</span>
+                    <span class="stat-label">Total Workouts</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ workout_stats.workouts_this_year }}</span>
+                    <span class="stat-label">This Year</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ workout_stats.workouts_this_month }}</span>
+                    <span class="stat-label">This Month</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ workout_stats.workouts_this_week }}</span>
+                    <span class="stat-label">This Week</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ workout_stats.avg_workouts_per_week }}</span>
+                    <span class="stat-label">Avg/Week</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ workout_stats.avg_workouts_per_month }}</span>
+                    <span class="stat-label">Avg/Month</span>
+                </div>
+            </div>
         </div>
+
+        <!-- Calorie Targets Card -->
+        {% if calorie_summary.daily_target %}
+        <div class="dashboard-card calorie-card">
+            <div class="card-header">
+                <h2>🔥 Calorie Targets</h2>
+                <a href="{% url 'main:meal_tracking' %}" class="view-all-link">Track Meals</a>
+            </div>
+            <div class="calorie-targets-grid">
+                <div class="calorie-target daily">
+                    <span class="calorie-number">{{ calorie_summary.daily_target|floatformat:0 }}</span>
+                    <span class="calorie-label">Daily Target</span>
+                </div>
+                {% if calorie_summary.adjusted_daily and calorie_summary.adjusted_daily != calorie_summary.daily_target %}
+                <div class="calorie-target adjusted">
+                    <span class="calorie-number">{{ calorie_summary.adjusted_daily|floatformat:0 }}</span>
+                    <span class="calorie-label">Adjusted Daily</span>
+                </div>
+                {% endif %}
+                <div class="calorie-target weekly">
+                    <span class="calorie-number">{{ calorie_summary.weekly_target|floatformat:0 }}</span>
+                    <span class="calorie-label">Weekly Target</span>
+                </div>
+                <div class="calorie-target monthly">
+                    <span class="calorie-number">{{ calorie_summary.monthly_target|floatformat:0 }}</span>
+                    <span class="calorie-label">Monthly Target</span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="dashboard-card calorie-card">
+            <div class="card-header">
+                <h2>🔥 Calorie Targets</h2>
+            </div>
+            <div class="empty-state">
+                <p>Complete your profile to see calorie targets</p>
+                <a href="{% url 'main:edit_profile' %}" class="btn btn-primary">Set Goals</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Goals Progress Card -->
+        <div class="dashboard-card goals-card">
+            <div class="card-header">
+                <h2>🎯 Goal Progress</h2>
+                <a href="{% url 'main:manage_goals' %}" class="view-all-link">Manage</a>
+            </div>
+            {% if goal_progress %}
+            <div class="goals-progress-list">
+                {% for progress in goal_progress %}
+                <div class="goal-progress-item">
+                    <div class="goal-info">
+                        <h4>{{ progress.goal.title }}</h4>
+                        <span class="goal-type">{{ progress.goal.get_goal_type_display }}</span>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ progress.progress_percentage }}%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span class="progress-percentage">{{ progress.progress_percentage|floatformat:1 }}%</span>
+                            {% if progress.current_value and progress.target_value %}
+                            <span class="progress-values">{{ progress.current_value|floatformat:1 }}/{{ progress.target_value }} {{ progress.goal.get_unit_display }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="goal-status status-{{ progress.status }}">
+                        {% if progress.status == 'completed' %}✅ Completed
+                        {% elif progress.status == 'in_progress' %}🔄 In Progress
+                        {% else %}⏸️ Not Started{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% elif active_goals %}
+            <div class="goals-list">
+                {% for goal in active_goals %}
+                <div class="goal-item">
+                    <div class="goal-info">
+                        <h4>{{ goal.title }}</h4>
+                        <span class="goal-type">{{ goal.get_goal_type_display }}</span>
+                    </div>
+                    {% if goal.target_value %}
+                    <div class="goal-target">
+                        Target: {{ goal.target_value }} {{ goal.get_unit_display }}
+                    </div>
+                    {% endif %}
+                    {% if goal.target_date %}
+                    <div class="goal-date">
+                        Due: {{ goal.target_date|date:"M d, Y" }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No goals set yet. Add your first fitness goal!</p>
+                <a href="{% url 'main:add_goal' %}" class="btn btn-primary">Add Goal</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Stats Overview -->
+        <div class="dashboard-card quick-stats-card">
+            <div class="card-header">
+                <h2>📊 Quick Overview</h2>
+            </div>
+            <div class="quick-stats-grid">
+                <div class="quick-stat">
+                    <span class="stat-icon">🏋️</span>
+                    <div class="stat-info">
+                        <span class="stat-value">{{ workout_stats.workouts_this_week }}</span>
+                        <span class="stat-desc">Workouts this week</span>
+                    </div>
+                </div>
+                <div class="quick-stat">
+                    <span class="stat-icon">🎯</span>
+                    <div class="stat-info">
+                        <span class="stat-value">{{ active_goals.count }}</span>
+                        <span class="stat-desc">Active goals</span>
+                    </div>
+                </div>
+                {% if calorie_summary.daily_target %}
+                <div class="quick-stat">
+                    <span class="stat-icon">🔥</span>
+                    <div class="stat-info">
+                        <span class="stat-value">{{ calorie_summary.daily_target|floatformat:0 }}</span>
+                        <span class="stat-desc">Daily calories</span>
+                    </div>
+                </div>
+                {% endif %}
+                {% if user_info.bmr %}
+                <div class="quick-stat">
+                    <span class="stat-icon">⚡</span>
+                    <div class="stat-info">
+                        <span class="stat-value">{{ user_info.bmr|floatformat:0 }}</span>
+                        <span class="stat-desc">BMR cal/day</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Activity Card -->
+        <div class="dashboard-card recent-activity-card">
+            <div class="card-header">
+                <h2>📈 Recent Activity</h2>
+            </div>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <span class="activity-icon">💪</span>
+                    <div class="activity-info">
+                        <span class="activity-text">{{ workout_stats.workouts_this_week }} workouts completed this week</span>
+                        <span class="activity-time">This week</span>
+                    </div>
+                </div>
+                {% if calorie_summary.adjusted_daily and calorie_summary.adjusted_daily != calorie_summary.daily_target %}
+                <div class="activity-item">
+                    <span class="activity-icon">🔥</span>
+                    <div class="activity-info">
+                        <span class="activity-text">Calorie target adjusted based on recent eating</span>
+                        <span class="activity-time">Today</span>
+                    </div>
+                </div>
+                {% endif %}
+                {% for progress in goal_progress %}
+                {% if progress.progress_percentage > 0 %}
+                <div class="activity-item">
+                    <span class="activity-icon">🎯</span>
+                    <div class="activity-info">
+                        <span class="activity-text">{{ progress.progress_percentage|floatformat:1 }}% progress on {{ progress.goal.title }}</span>
+                        <span class="activity-time">Goal update</span>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
     </div>
-    {% else %}
-    <div class="goals-section">
-        <h2>Your Goals</h2>
-        <div class="empty-goals">
-            <p>You haven't set any goals yet. Start by adding your first fitness goal!</p>
-            <a href="{% url 'main:add_goal' %}" class="btn btn-primary">Add Your First Goal</a>
-        </div>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

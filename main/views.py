@@ -44,29 +44,43 @@ def user_logout(request):
 
 @login_required
 def homepage(request):
-    """Homepage for logged-in users."""
+    """Dashboard homepage for logged-in users."""
     # Get or create user profile
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
     
-    # Calculate basic stats
-    total_workouts = request.user.workouts.count()
-    
-    # Get user's active goals
-    active_goals = request.user.goals.filter(is_active=True)[:3]  # Show max 3 goals
-    
-    # Check if profile is complete for BMR calculation
-    bmr_incomplete = not (user_profile.age and user_profile.current_weight and user_profile.gender)
-    
-    # Get calorie summary for the user
+    # Get comprehensive dashboard data
+    workout_stats = user_profile.get_workout_statistics()
     calorie_summary = user_profile.get_calorie_summary()
+    goal_progress = user_profile.get_goal_progress_summary()
+    active_goals = request.user.goals.filter(is_active=True)
+    
+    # Check if profile is complete
+    profile_incomplete = not (user_profile.age and user_profile.current_weight)
+    bmr_incomplete = not (user_profile.age and user_profile.current_weight and user_profile.gender)
+    goals_incomplete = not active_goals.exists()
+    
+    # User information summary
+    user_info = {
+        'name': request.user.get_full_name() or request.user.username,
+        'age': user_profile.age,
+        'weight': user_profile.current_weight,
+        'weight_unit': user_profile.weight_unit,
+        'gender': user_profile.get_gender_display() if user_profile.gender else None,
+        'body_fat': user_profile.body_fat_percentage,
+        'bmr': user_profile.calculate_bmr(),
+        'tdee': user_profile.calculate_tdee(),
+    }
     
     context = {
         'user_profile': user_profile,
-        'total_workouts': total_workouts,
-        'profile_incomplete': not (user_profile.age and user_profile.current_weight),
-        'bmr_incomplete': bmr_incomplete,
-        'active_goals': active_goals,
+        'user_info': user_info,
+        'workout_stats': workout_stats,
         'calorie_summary': calorie_summary,
+        'goal_progress': goal_progress,
+        'active_goals': active_goals,
+        'profile_incomplete': profile_incomplete,
+        'bmr_incomplete': bmr_incomplete,
+        'goals_incomplete': goals_incomplete,
     }
     
     return render(request, 'main/homepage.html', context)

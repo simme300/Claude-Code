@@ -232,6 +232,101 @@ class UserProfile(models.Model):
             'bmr': self.calculate_bmr()
         }
     
+    def get_workout_statistics(self):
+        """Get comprehensive workout statistics."""
+        from datetime import date, timedelta
+        import datetime as dt
+        
+        today = date.today()
+        current_year = today.year
+        start_of_year = dt.date(current_year, 1, 1)
+        start_of_month = today.replace(day=1)
+        start_of_week = today - timedelta(days=today.weekday())
+        
+        user_workouts = self.user.workouts
+        
+        # Calculate workout counts
+        total_workouts = user_workouts.count()
+        workouts_this_year = user_workouts.filter(created_at__date__gte=start_of_year).count()
+        workouts_this_month = user_workouts.filter(created_at__date__gte=start_of_month).count()
+        workouts_this_week = user_workouts.filter(created_at__date__gte=start_of_week).count()
+        
+        # Calculate averages
+        days_this_year = (today - start_of_year).days + 1
+        days_this_month = (today - start_of_month).days + 1
+        days_this_week = (today - start_of_week).days + 1
+        
+        avg_workouts_per_week_this_year = (workouts_this_year / days_this_year * 7) if days_this_year > 0 else 0
+        avg_workouts_per_month = (workouts_this_year / (today.month)) if today.month > 0 else 0
+        
+        return {
+            'total_workouts': total_workouts,
+            'workouts_this_year': workouts_this_year,
+            'workouts_this_month': workouts_this_month,
+            'workouts_this_week': workouts_this_week,
+            'avg_workouts_per_week': round(avg_workouts_per_week_this_year, 1),
+            'avg_workouts_per_month': round(avg_workouts_per_month, 1),
+        }
+    
+    def get_goal_progress_summary(self):
+        """Get progress summary for user's active goals."""
+        active_goals = self.user.goals.filter(is_active=True)
+        goal_progress = []
+        
+        for goal in active_goals:
+            progress_data = {
+                'goal': goal,
+                'progress_percentage': 0,
+                'current_value': None,
+                'target_value': goal.target_value,
+                'status': 'not_started'
+            }
+            
+            # Calculate progress based on goal type
+            if goal.goal_type == goal.WEIGHT_LOSS and self.current_weight and self.target_weight:
+                if goal.target_value:
+                    # Goal target value is the target weight
+                    current_weight_kg = self.get_weight_in_kg()
+                    target_weight_kg = float(goal.target_value)
+                    initial_weight = current_weight_kg + abs(current_weight_kg - target_weight_kg)
+                    
+                    if initial_weight != target_weight_kg:
+                        progress = abs(initial_weight - current_weight_kg) / abs(initial_weight - target_weight_kg)
+                        progress_data['progress_percentage'] = min(100, max(0, progress * 100))
+                        progress_data['current_value'] = current_weight_kg
+                        progress_data['status'] = 'in_progress' if progress < 1.0 else 'completed'
+            
+            elif goal.goal_type == goal.WEIGHT_GAIN and self.current_weight and self.target_weight:
+                if goal.target_value:
+                    current_weight_kg = self.get_weight_in_kg()
+                    target_weight_kg = float(goal.target_value)
+                    initial_weight = current_weight_kg - abs(target_weight_kg - current_weight_kg)
+                    
+                    if initial_weight != target_weight_kg:
+                        progress = abs(current_weight_kg - initial_weight) / abs(target_weight_kg - initial_weight)
+                        progress_data['progress_percentage'] = min(100, max(0, progress * 100))
+                        progress_data['current_value'] = current_weight_kg
+                        progress_data['status'] = 'in_progress' if progress < 1.0 else 'completed'
+            
+            elif goal.goal_type == goal.BODY_FAT and self.body_fat_percentage:
+                if goal.target_value:
+                    current_bf = float(self.body_fat_percentage)
+                    target_bf = float(goal.target_value)
+                    initial_bf = current_bf + abs(current_bf - target_bf)
+                    
+                    if initial_bf != target_bf:
+                        progress = abs(initial_bf - current_bf) / abs(initial_bf - target_bf)
+                        progress_data['progress_percentage'] = min(100, max(0, progress * 100))
+                        progress_data['current_value'] = current_bf
+                        progress_data['status'] = 'in_progress' if progress < 1.0 else 'completed'
+            
+            # For other goal types, we can't automatically calculate progress
+            # They would need manual updates or specific tracking
+            
+            goal_progress.append(progress_data)
+        
+        return goal_progress
+    
     def __str__(self):
         return f"{self.user.username}'s Profile"
 
