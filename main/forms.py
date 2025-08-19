@@ -185,7 +185,7 @@ class ProgressPictureForm(forms.ModelForm):
 class GoalForm(forms.ModelForm):
     class Meta:
         model = Goal
-        fields = ['title', 'description', 'goal_type', 'target_value', 'unit', 'target_date']
+        fields = ['title', 'description', 'goal_type', 'target_value', 'starting_value', 'unit', 'target_date']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -205,6 +205,12 @@ class GoalForm(forms.ModelForm):
                 'step': '0.01',
                 'placeholder': 'Target value (optional)'
             }),
+            'starting_value': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01',
+                'placeholder': 'Starting value (optional)'
+            }),
             'unit': forms.Select(attrs={
                 'class': 'form-control'
             }),
@@ -218,6 +224,7 @@ class GoalForm(forms.ModelForm):
             'description': 'Description (Optional)',
             'goal_type': 'Goal Type',
             'target_value': 'Target Value (Optional)',
+            'starting_value': 'Starting Value (Optional)',
             'unit': 'Unit',
             'target_date': 'Target Date (Optional)'
         }

@@ -390,9 +390,105 @@ Each session ends when we commit and push changes to git. Sessions are numbered 
 
 ---
 
+## Session 9: Goal Progress Calculation Fix and UI Refinements
+
+**Date**: August 19, 2025
+**Git Commits**: Upcoming commit
+
+### User Prompts
+
+- "in the goal section, the progress bar shows that user is 50% towards reaching his goal. In this case it's not true. If the goal is to lose 5kgs in a month as an example, the progress bar should be a percentage of how much weight the person has lost compared to the goal."
+- "In the workout statistics card, comment out the avg weekly workouts column and avg monthly workouts column. We might need them later so do not remove them."
+- "now update the Sessio.md file before commiting and pushing the new changes to git with a descriptive message."
+
+### Accomplishments
+
+#### Goal Progress Calculation Fix
+- **Fixed fundamental flaw in progress calculation logic**:
+  - **Previous**: Used estimated starting values based on current weight vs target
+  - **New**: Uses actual baseline measurements from when goal was created
+  - **Accurate progress tracking** for weight loss, weight gain, and body fat goals
+
+- **Added `starting_value` field to Goal model**:
+  - Tracks baseline measurement when goal is created (e.g., starting weight)
+  - Required for proper progress percentage calculations
+  - Includes proper help text and form integration
+
+- **Rewrote progress calculation methods**:
+  - **Weight Loss**: `actual_weight_lost / target_weight_loss`
+  - **Weight Gain**: `actual_weight_gained / target_weight_gain` 
+  - **Body Fat**: `actual_bf_reduced / target_bf_reduction`
+  - **Example**: Started 80kg, now 75kg, goal lose 10kg = (80-75)/10 = 50% accurate progress
+
+#### UI Refinements
+- **Simplified workout statistics card**:
+  - Commented out "Avg/Week" and "Avg/Month" columns
+  - Preserved backend logic and HTML for potential future restoration
+  - More focused display with 4 key metrics: Total, This Year, This Month, This Week
+
+### Technical Changes
+
+#### Models (`main/models.py`)
+- **Added `starting_value` field** to Goal model with proper validation and help text
+- **Completely rewrote `get_goal_progress_summary()` method**:
+  - Fixed weight loss progress: uses actual weight lost vs target weight loss
+  - Fixed weight gain progress: uses actual weight gained vs target weight gain
+  - Fixed body fat progress: uses actual body fat reduced vs target reduction
+  - Enhanced status tracking with accurate progress thresholds
+  - Eliminated estimated/incorrect progress calculations
+
+#### Forms (`main/forms.py`)
+- **Enhanced GoalForm** with starting_value field
+- **Added proper widgets, labels, and placeholders** for starting_value
+- **Maintained form styling consistency** with existing design
+
+#### Database Migrations
+- **Created migration `0011_goal_starting_value.py`** for new field
+- **Successfully applied migration** without data loss
+
+#### Templates (`main/templates/main/homepage.html`)
+- **Commented out average workout columns** in workout statistics card
+- **Preserved HTML code** with clear comments for future restoration
+- **Maintained responsive grid layout** with fewer columns
+
+### Key Features
+
+#### Accurate Goal Progress Tracking
+- **Real Baseline Tracking**: Uses actual starting measurements instead of estimates
+- **Precise Calculations**: Shows exact percentage of progress toward goal
+- **Proper Status Indicators**: Accurate not_started, in_progress, completed states
+- **Multiple Goal Types**: Works correctly for weight loss, weight gain, and body fat goals
+
+#### Cleaner Workout Statistics
+- **Focused Display**: Shows most relevant workout metrics
+- **Preserved Functionality**: Backend calculations remain intact
+- **Future-Ready**: Easy to restore average columns when needed
+
+### Progress Calculation Examples
+
+**Before (Incorrect)**:
+- Goal: Lose 5kg, Current: 75kg → Estimated starting weight, unreliable progress
+
+**After (Correct)**:
+- Goal: Lose 5kg, Starting: 80kg, Current: 77kg → Progress: (80-77)/5 = 60% ✅
+- Goal: Gain 3kg, Starting: 70kg, Current: 72kg → Progress: (72-70)/3 = 67% ✅
+- Goal: Reduce 4% body fat, Starting: 20%, Current: 18% → Progress: (20-18)/4 = 50% ✅
+
+### Testing Results
+
+- Migration applied successfully without errors
+- Goal progress calculations now mathematically accurate
+- Workout statistics display properly with 4 columns
+- Server running without issues after all changes
+- Form validation working correctly with new starting_value field
+- Responsive design maintained across all screen sizes
+
+---
+
 ## Next Session Preparation
 
-- Workout management fully enhanced with deletion and optimized layouts
-- Calorie tracking now shows clear consumption vs. goal progress
-- Dashboard provides comprehensive fitness tracking in intuitive format
-- Ready for additional features or further UX improvements
+- Goal progress tracking now mathematically accurate and reliable
+- Workout statistics display refined and focused on key metrics
+- Dashboard provides comprehensive fitness tracking with correct progress indicators
+- Starting value baseline tracking enables proper goal monitoring
+- Ready for additional goal types or further dashboard enhancements

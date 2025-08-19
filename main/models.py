@@ -311,41 +311,55 @@ class UserProfile(models.Model):
             }
             
             # Calculate progress based on goal type
-            if goal.goal_type == goal.WEIGHT_LOSS and self.current_weight and self.target_weight:
-                if goal.target_value:
-                    # Goal target value is the target weight
+            if goal.goal_type == goal.WEIGHT_LOSS and self.current_weight:
+                if goal.target_value and goal.starting_value:
+                    # For weight loss: target_value is kg to lose, starting_value is starting weight
                     current_weight_kg = self.get_weight_in_kg()
-                    target_weight_kg = float(goal.target_value)
-                    initial_weight = current_weight_kg + abs(current_weight_kg - target_weight_kg)
+                    starting_weight_kg = float(goal.starting_value)
+                    target_weight_loss_kg = float(goal.target_value)
                     
-                    if initial_weight != target_weight_kg:
-                        progress = abs(initial_weight - current_weight_kg) / abs(initial_weight - target_weight_kg)
+                    # Calculate actual weight lost so far
+                    actual_weight_lost = starting_weight_kg - current_weight_kg
+                    
+                    # Progress = actual_weight_lost / target_weight_loss
+                    if target_weight_loss_kg > 0:
+                        progress = actual_weight_lost / target_weight_loss_kg
                         progress_data['progress_percentage'] = min(100, max(0, progress * 100))
-                        progress_data['current_value'] = current_weight_kg
+                        progress_data['current_value'] = actual_weight_lost
                         progress_data['status'] = 'in_progress' if progress < 1.0 else 'completed'
             
-            elif goal.goal_type == goal.WEIGHT_GAIN and self.current_weight and self.target_weight:
-                if goal.target_value:
+            elif goal.goal_type == goal.WEIGHT_GAIN and self.current_weight:
+                if goal.target_value and goal.starting_value:
+                    # For weight gain: target_value is kg to gain, starting_value is starting weight
                     current_weight_kg = self.get_weight_in_kg()
-                    target_weight_kg = float(goal.target_value)
-                    initial_weight = current_weight_kg - abs(target_weight_kg - current_weight_kg)
+                    starting_weight_kg = float(goal.starting_value)
+                    target_weight_gain_kg = float(goal.target_value)
                     
-                    if initial_weight != target_weight_kg:
-                        progress = abs(current_weight_kg - initial_weight) / abs(target_weight_kg - initial_weight)
+                    # Calculate actual weight gained so far
+                    actual_weight_gained = current_weight_kg - starting_weight_kg
+                    
+                    # Progress = actual_weight_gained / target_weight_gain
+                    if target_weight_gain_kg > 0:
+                        progress = actual_weight_gained / target_weight_gain_kg
                         progress_data['progress_percentage'] = min(100, max(0, progress * 100))
-                        progress_data['current_value'] = current_weight_kg
+                        progress_data['current_value'] = actual_weight_gained
                         progress_data['status'] = 'in_progress' if progress < 1.0 else 'completed'
             
             elif goal.goal_type == goal.BODY_FAT and self.body_fat_percentage:
-                if goal.target_value:
+                if goal.target_value and goal.starting_value:
+                    # For body fat: target_value is % to reduce, starting_value is starting body fat %
                     current_bf = float(self.body_fat_percentage)
-                    target_bf = float(goal.target_value)
-                    initial_bf = current_bf + abs(current_bf - target_bf)
+                    starting_bf = float(goal.starting_value)
+                    target_bf_reduction = float(goal.target_value)
                     
-                    if initial_bf != target_bf:
-                        progress = abs(initial_bf - current_bf) / abs(initial_bf - target_bf)
+                    # Calculate actual body fat % reduced so far
+                    actual_bf_reduced = starting_bf - current_bf
+                    
+                    # Progress = actual_bf_reduced / target_bf_reduction
+                    if target_bf_reduction > 0:
+                        progress = actual_bf_reduced / target_bf_reduction
                         progress_data['progress_percentage'] = min(100, max(0, progress * 100))
-                        progress_data['current_value'] = current_bf
+                        progress_data['current_value'] = actual_bf_reduced
                         progress_data['status'] = 'in_progress' if progress < 1.0 else 'completed'
             
             # For other goal types, we can't automatically calculate progress
@@ -511,6 +525,7 @@ class Goal(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     target_value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    starting_value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Starting value when goal was created (e.g., starting weight)")
     
     WEIGHT_LOSS = "weight_loss"
     WEIGHT_GAIN = "weight_gain"
