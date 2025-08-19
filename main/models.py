@@ -217,17 +217,45 @@ class UserProfile(models.Model):
         return round(adjusted_daily, 0)
     
     def get_calorie_summary(self):
-        """Get a summary of all calorie targets."""
+        """Get a summary of all calorie targets and consumption."""
+        from datetime import date, timedelta
+        
         daily = self.calculate_daily_calorie_target()
         weekly = self.calculate_weekly_calorie_target()
         monthly = self.calculate_monthly_calorie_target()
         adjusted = self.calculate_adjusted_daily_calories()
+        
+        # Calculate consumption for different periods
+        today = date.today()
+        
+        # Daily consumption (today)
+        daily_consumption = 0
+        daily_meals = self.user.meals.filter(date_consumed=today)
+        for meal in daily_meals:
+            daily_consumption += float(meal.total_calories)
+        
+        # Weekly consumption (last 7 days)
+        week_start = today - timedelta(days=6)  # Last 7 days including today
+        weekly_consumption = 0
+        weekly_meals = self.user.meals.filter(date_consumed__range=[week_start, today])
+        for meal in weekly_meals:
+            weekly_consumption += float(meal.total_calories)
+        
+        # Monthly consumption (last 30 days)
+        month_start = today - timedelta(days=29)  # Last 30 days including today
+        monthly_consumption = 0
+        monthly_meals = self.user.meals.filter(date_consumed__range=[month_start, today])
+        for meal in monthly_meals:
+            monthly_consumption += float(meal.total_calories)
         
         return {
             'daily_target': daily,
             'weekly_target': weekly,
             'monthly_target': monthly,
             'adjusted_daily': adjusted,
+            'daily_consumption': round(daily_consumption, 0),
+            'weekly_consumption': round(weekly_consumption, 0),
+            'monthly_consumption': round(monthly_consumption, 0),
             'tdee': self.calculate_tdee(),
             'bmr': self.calculate_bmr()
         }

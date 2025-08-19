@@ -127,22 +127,21 @@
             </div>
             <div class="calorie-targets-grid">
                 <div class="calorie-target daily">
-                    <span class="calorie-number">{{ calorie_summary.daily_target|floatformat:0 }}</span>
-                    <span class="calorie-label">Daily Target</span>
+                    {% if calorie_summary.adjusted_daily and calorie_summary.adjusted_daily != calorie_summary.daily_target %}
+                        <span class="calorie-number">{{ calorie_summary.daily_consumption|floatformat:0 }}/{{ calorie_summary.adjusted_daily|floatformat:0 }}</span>
+                        <span class="calorie-label">Daily (Adjusted)</span>
+                    {% else %}
+                        <span class="calorie-number">{{ calorie_summary.daily_consumption|floatformat:0 }}/{{ calorie_summary.daily_target|floatformat:0 }}</span>
+                        <span class="calorie-label">Daily</span>
+                    {% endif %}
                 </div>
-                {% if calorie_summary.adjusted_daily and calorie_summary.adjusted_daily != calorie_summary.daily_target %}
-                <div class="calorie-target adjusted">
-                    <span class="calorie-number">{{ calorie_summary.adjusted_daily|floatformat:0 }}</span>
-                    <span class="calorie-label">Adjusted Daily</span>
-                </div>
-                {% endif %}
                 <div class="calorie-target weekly">
-                    <span class="calorie-number">{{ calorie_summary.weekly_target|floatformat:0 }}</span>
-                    <span class="calorie-label">Weekly Target</span>
+                    <span class="calorie-number">{{ calorie_summary.weekly_consumption|floatformat:0 }}/{{ calorie_summary.weekly_target|floatformat:0 }}</span>
+                    <span class="calorie-label">Weekly</span>
                 </div>
                 <div class="calorie-target monthly">
-                    <span class="calorie-number">{{ calorie_summary.monthly_target|floatformat:0 }}</span>
-                    <span class="calorie-label">Monthly Target</span>
+                    <span class="calorie-number">{{ calorie_summary.monthly_consumption|floatformat:0 }}/{{ calorie_summary.monthly_target|floatformat:0 }}</span>
+                    <span class="calorie-label">Monthly</span>
                 </div>
             </div>
         </div>

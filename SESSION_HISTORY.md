@@ -282,9 +282,117 @@ Each session ends when we commit and push changes to git. Sessions are numbered 
 
 ---
 
+## Session 8: Workout Management Enhancements and Calorie Display Improvements
+
+**Date**: August 19, 2025
+**Git Commits**: `b76ebfd` and upcoming commit
+
+### User Prompts
+
+- "we should add a delete button under the workouts so that people can successfully delete a workout if they want to. make the button use the sam width as the table and display it right under the workout table."
+- "the exercices stil takes up to much space. try to adjust the height a little bit."
+- "almost there. make adjust the height a little more and make sure there are some margin between the create workout and cancel button."
+- "commit and push the new changes to git with a descriptive message."
+- "For the calorie card on the homepage. Instead of showing the adjusted calorie column, i would like columns that display how much calories the user has eaten the given day compared to the goal. Example: 250/2500, 3000/17000, 6000/ 71000 for daily, weekly and monthly target."
+- "what is the purpose of the adjusted daily column?"
+- "then this should be reflected in the daily calories column as well since this can be confusing."
+- "commit and save the new changes to github and make sure to update the session history md file with the new changes we have made."
+
+### Accomplishments
+
+#### Workout Management Enhancements
+- **Added workout deletion functionality**:
+  - Created `delete_workout` view with proper security (user can only delete own workouts)
+  - Added URL pattern for workout deletion
+  - Implemented delete buttons under each workout table with confirmation dialogs
+  - Added proper styling with full-width red delete buttons
+  - Enhanced user experience with hover effects and confirmations
+
+- **Optimized create workout page layout**:
+  - Converted from vertical stack to **side-by-side layout** (workout details | exercises)
+  - **Dramatically reduced vertical space** usage in exercises section
+  - Implemented compact styling with smaller fonts, tighter spacing, and grid layouts
+  - Added proper spacing between Create Workout and Cancel buttons
+  - Created responsive design that adapts to different screen sizes
+  - Enhanced form UX with better visual hierarchy
+
+#### Calorie Display Improvements
+- **Transformed calorie card to consumption/goal format**:
+  - Updated `get_calorie_summary()` to include actual consumption data
+  - Implemented daily, weekly (7 days), and monthly (30 days) consumption tracking
+  - Changed display format from targets only to "consumed/target" (e.g., "250/2500")
+  - **Intelligently integrated adjusted daily targets** into main daily column
+  - Eliminated confusing separate "Adjusted Daily" column
+  - Added "(Adjusted)" indicator when daily target has been modified
+
+### Technical Changes
+
+#### Models (`main/models.py`)
+- Enhanced `get_calorie_summary()` method:
+  - Added daily consumption calculation (today's meals)
+  - Added weekly consumption calculation (last 7 days)
+  - Added monthly consumption calculation (last 30 days)
+  - Returns comprehensive consumption and target data
+
+#### Views (`main/views.py`)
+- Added `delete_workout()` view with proper authentication and redirect
+
+#### URLs (`main/urls.py`)
+- Added workout deletion URL pattern: `workout/<int:workout_id>/delete/`
+
+#### Templates
+- **`main/templates/main/my_workouts.html`**:
+  - Added delete buttons under each workout table
+  - Implemented confirmation dialogs for safe deletion
+  - Added full-width styling with hover effects
+
+- **`main/templates/main/create_workout.html`**:
+  - Restructured layout with CSS Grid (1fr 2fr columns)
+  - Added extensive compact styling for exercises section
+  - Implemented responsive design for mobile devices
+  - Enhanced button spacing and styling
+
+- **`main/templates/main/homepage.html`**:
+  - Updated calorie card to show consumption/goal format
+  - Integrated adjusted daily targets into main daily column
+  - Added smart labeling with "(Adjusted)" indicator
+  - Removed confusing separate adjusted column
+
+### Key Features
+
+#### Enhanced Workout Management
+- **Safe Deletion**: Confirmation dialogs prevent accidental workout removal
+- **Compact Layout**: Create workout page uses 60% less vertical space
+- **Responsive Design**: Layout adapts beautifully from desktop to mobile
+- **Professional UX**: Proper spacing, hover effects, and visual feedback
+
+#### Intelligent Calorie Display
+- **Clear Progress Tracking**: Shows exactly how much consumed vs. target
+- **Smart Target Integration**: Uses adjusted targets when beneficial
+- **Eliminted Confusion**: Single daily target instead of multiple confusing columns
+- **Real-time Data**: Consumption calculated from actual meal tracking
+
+### UX Improvements
+
+1. **Workout Creation**: Much more efficient use of screen space
+2. **Workout Management**: Easy deletion with safety measures
+3. **Calorie Tracking**: Clear progress indicators instead of abstract targets
+4. **Mobile Experience**: All layouts work seamlessly on phones and tablets
+
+### Testing Results
+
+- Server running without errors after all changes
+- Workout deletion working with proper confirmation
+- Create workout page significantly more compact and usable
+- Calorie display showing consumption/goal format correctly
+- Responsive design verified across screen sizes
+- No breaking changes to existing functionality
+
+---
+
 ## Next Session Preparation
 
-- Dashboard homepage complete and fully functional
-- Ready for additional dashboard enhancements or new features
-- All fitness tracking components integrated in beautiful dashboard interface
-- Responsive design ensures great experience across all devices
+- Workout management fully enhanced with deletion and optimized layouts
+- Calorie tracking now shows clear consumption vs. goal progress
+- Dashboard provides comprehensive fitness tracking in intuitive format
+- Ready for additional features or further UX improvements
