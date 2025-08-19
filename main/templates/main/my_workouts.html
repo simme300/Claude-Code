@@ -62,9 +62,21 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="workout-actions">
+                                <form method="post" action="{% url 'main:delete_workout' workout.id %}" onsubmit="return confirm('Are you sure you want to delete this workout? This action cannot be undone.');" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-delete">Delete Workout</button>
+                                </form>
+                            </div>
                         {% else %}
                             <div class="no-exercises">
                                 <p>No exercises recorded for this workout.</p>
+                            </div>
+                            <div class="workout-actions">
+                                <form method="post" action="{% url 'main:delete_workout' workout.id %}" onsubmit="return confirm('Are you sure you want to delete this workout? This action cannot be undone.');" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-delete">Delete Workout</button>
+                                </form>
                             </div>
                         {% endif %}
                     </div>
@@ -120,6 +132,35 @@
         padding: 0.5rem;
         font-size: 0.875rem;
     }
+}
+
+.workout-actions {
+    margin-top: 1rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
 </style>
 {% endblock %}

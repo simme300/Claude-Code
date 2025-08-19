@@ -485,6 +485,14 @@ def edit_meal(request, meal_id):
 
 
 @login_required
+def delete_workout(request, workout_id):
+    """Delete a workout."""
+    workout = request.user.workouts.get(id=workout_id)
+    workout.delete()
+    return redirect('main:my_workouts')
+
+
+@login_required
 def delete_meal(request, meal_id):
     """Delete a meal."""
     meal = request.user.meals.get(id=meal_id)
